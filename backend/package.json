@@ -2,12 +2,12 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --watch . --ext ts,json --exec tsx ./index.ts",
     "build": "tsc",
-    "start": "node ./dist/index",
-    "render": "pnpm build && pnpm start"
+    "build:front": "cd ../client && pnpm install && pnpm build",
+    "start": "pnpm build:front && node dist/index.js"
   },
   "keywords": [],
   "author": "",
