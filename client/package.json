@@ -13,5 +13,9 @@
 	"packageManager": "pnpm@10.17.1",
 	"devDependencies": {
 		"parcel": "^2.16.1"
+	},
+	"dependencies": {
+		"@lit-labs/router": "^0.1.4",
+		"lit": "^3.3.1"
 	}
 }

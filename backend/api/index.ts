@@ -14,11 +14,16 @@ app.get("/test", (req, res) => {
     res.json({ok: true})
 });
 
-// Le decimos a express que de todas las peticiones get "/(.*)/"
-app.get(/(.*)/, (req, res) => {
-    // Le pasamos la ruta con resolve en el directorio en el que estamos mas la ruta donde esta el index.html 
-	const route = path.resolve(__dirname, "../../client/dist/index.html");
-	res.sendFile(route); // Y respondemos enviando el archivo index.html
+// Determinamos la ruta absoluta (desde el dist del backend) a la carpeta 'dist' del frontend
+// __dirname es 'desafio-integrador-4/backend/dist/api'. Subimos (..) y entramos a 'dist'. Subimos otro nivel y entramos a 'backend'. Por ultimo, subimos el ultimo nivel y entramos a 'pet-finder'
+const staticPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
+
+// Usamos express.static para servir la carpeta compilada
+app.use(express.static(staticPath));
+
+// SPA FALLBACK: Redirigimos todas las demás rutas a index.html
+app.get('/{*any}', (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'));
 });
 
 app.listen(port, () => {
