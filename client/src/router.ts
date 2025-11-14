@@ -5,7 +5,7 @@ import { Router } from '@lit-labs/router';
 // Pages
 import './pages/home-page'
 
-@customElement('my-main')
+@customElement('my-root')
 export class MyElement extends LitElement {
     
     // 1. El router se instancia conectado al 'this' (el componente host)
