@@ -13,10 +13,6 @@ User.init({
         unique: true, // Le decimos que su valor es unico y no puede haber uno igual en la columna
         allowNull: false // No acepta un valor vacio
     },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false // No acepta un valor vacio
-    },
     lat: DataTypes.FLOAT,
     lng: DataTypes.FLOAT
 }, { sequelize, modelName: "User" });

@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import * as path from "path";
 import "dotenv/config";
+import { sequelize } from "../db";
 
 const port = process.env.PORT; // Establecemos el puerto recuperado de las variables de entorno
 const app = express(); // Inicializamos express
@@ -10,7 +11,9 @@ const app = express(); // Inicializamos express
 app.use(cors()); // Le decimos que la app usara el middleware de cors
 app.use(express.json()); // Y que usara el middleware de json de express para recibir peticiones
 
-app.get("/test", (req, res) => {
+// sequelize.sync({force: true}).then(e => e)
+
+app.get("/test", async (req, res) => {
     res.json({ok: true})
 });
 
