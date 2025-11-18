@@ -3,24 +3,20 @@ import { Auth } from "../db/models";
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt'
 
+// Extraemos el secret del .env
 const SECRET = process.env.SECRET;
 
+// Creamos una funcion asincrona de bcrypt que es mas seguro que sha
 async function getBcryptHash(text: string){
+    // Le decimos que espere el hash del texto recibido y que tenga un retrase de 10 ms
     const passHashed = await bcrypt.hash(text, 10);
-    return passHashed;
+    return passHashed; // Retornamos el texto hasheado
 }
-
-// // Funcion para crear un hash sha256 y proteger contraseñas
-// function getSHA256ofString(text: string) {
-// 	return crypto // Retornamos a crypto
-//     .createHash("sha256") // Que crea un hash sha256
-//     .update(text) // Que actualiza el texto a sha256
-//     .digest("hex"); // Y resuelve con el sha256 en hexadecimal
-// }
 
 // Creamos la funcion para autorizar un registro (recibimos email, password y userId)
 async function authRegister(email: string, password: string, userId: number) {
 	try {
+        // Hasheamos la contraseña recibida
         const passHashed = await getBcryptHash(password);
 
         // Destructuramos en un array lo que nos de el findOrCreate (1. El elemento creado 2. El estado de creacion)
@@ -45,9 +41,11 @@ async function authLogIn(email: string, password: string) {
         // Hacemos un findOne donde buscamos el email recibido y el password en sha256 en la tabla Auth
         const findAuth = await Auth.findOne({where: {email}});
 
+        // Obtenemos el password del findAuth
         const findAuthPassword = await findAuth.get('password') as string;
 
-        if(await bcrypt.compare(password, findAuthPassword)){ // Si encontro el user
+        // Verificamos si la comparacion del password recibido y el password guardado en la db son iguales
+        if(await bcrypt.compare(password, findAuthPassword)){
             // Creamos un token con jwt guardando el id
             const token = jwt.sign({id: findAuth.get('userId')}, SECRET);
             return token; // Y retornamos el token
