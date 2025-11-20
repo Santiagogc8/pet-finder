@@ -15,5 +15,4 @@ Pet.init({
     lat: DataTypes.FLOAT,
     lng: DataTypes.FLOAT,
     imageUrl: DataTypes.STRING
-    // Faltaria el id del user pero ese lo agregariamos directamente desde otro archivo con todas las relaciones
 }, {sequelize, modelName: 'Pet'})

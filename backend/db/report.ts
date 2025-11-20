@@ -6,7 +6,7 @@ export class Report extends Model {}
 Report.init({
     lastSeen: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false // No recibe null
     },
     reporterPhone: {
         type: DataTypes.STRING,
