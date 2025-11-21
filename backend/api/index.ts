@@ -4,16 +4,32 @@ import cors from "cors";
 import * as path from "path";
 import "dotenv/config";
 import { sequelize } from "../db";
+import { Request, Response, NextFunction } from 'express'; // Importaciones para el middleware
 
 // Controllers
 import { registerUser } from "../controllers/user-controller";
-import { authLogIn } from "../controllers/auth-controller";
+import { authLogIn, verifyToken } from "../controllers/auth-controller";
 
 const port = process.env.PORT; // Establecemos el puerto recuperado de las variables de entorno
 const app = express(); // Inicializamos express
 
 app.use(cors()); // Le decimos que la app usara el middleware de cors
 app.use(express.json()); // Y que usara el middleware de json de express para recibir peticiones
+
+// Creamos un middleWare para obtener el authorization del header. Recibe el req, el res y la funcion next
+function authMiddleware(req: Request, res: Response, next: NextFunction){
+    const headerAuth = req.get("Authorization"); // Obtenemos el header Authorization
+
+    // Si no se recibio, tiramos error
+    if(!headerAuth) return res.status(401).json({error: 'not token provided'});
+
+    // Partimos el token cuando haya un espacio y accedemos a la posicion 1 del array devuelto
+    const token = headerAuth.split(" ")[1];
+    if(!token) return res.status(401).json({error: 'token malformed'}); // Si el token es algo raro, tiramos error
+
+    req.token = token; // Guardamos el token en req.token
+    next(); // Continuamos el flujo
+}
 
 // sequelize.sync({force: true}).then(e => e)
 
@@ -52,6 +68,28 @@ app.post("/auth/login", async (req, res) => {
 		res.status(500).json({ error: `Error ocurred: ${error.message}` });
 	}
 });
+
+// Obtener la informacion del usuario
+// Creamos el endpoint /me para obtener la informacion del usuario. Le pasamos el middleware authMiddleware
+app.get("/me", authMiddleware, async (req, res) =>{
+    const token = req.token; // Guardamos el token en una variable
+
+    // Si no recibimos token, tiramos error
+    if(!token) return res.status(400).json({error: "token was expected"}) 
+
+    try{ // Intentamos
+        const tokenRes = verifyToken(token); // Verificar el token recibido
+        if(tokenRes){ // Si el token no devuelve null
+            return res.json(tokenRes) // Respondemos con lo recibido
+        } else{ // Caso contrario
+            // Tiramos un 401
+            return res.status(401).json({error: "token invalid"}) 
+        }
+    } catch (error) { // Si hay error
+        // Tiramos error con el mesaje del error
+		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+	}
+})
 
 // Determinamos la ruta absoluta (desde el dist del backend) a la carpeta 'dist' del frontend
 // __dirname es 'desafio-integrador-4/backend/dist/api'. Subimos (..) y entramos a 'dist'. Subimos otro nivel y entramos a 'backend'. Por ultimo, subimos el ultimo nivel y entramos a 'pet-finder'

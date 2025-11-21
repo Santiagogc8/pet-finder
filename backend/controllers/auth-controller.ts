@@ -59,4 +59,13 @@ async function authLogIn(email: string, password: string) {
     }
 }
 
-export { authRegister, authLogIn };
+// Verificar un token
+function verifyToken(token: string){
+    try{
+        return jwt.verify(token, SECRET)
+    } catch(error){
+        return {error: `an error has ocurred: ${error.message}`} // Lo retornamos
+    }
+}
+
+export { authRegister, authLogIn, verifyToken };
