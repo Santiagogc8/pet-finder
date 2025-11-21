@@ -31,7 +31,7 @@ async function authRegister(email: string, password: string, userId: number, tra
             transaction // Le decimos que su propiedad transaction es lo recibido en el parametro transaction
         });
 
-        return auth.get('userId') // Retornamos el userId obtenido 
+        return await auth.get('userId') // Retornamos el userId obtenido 
 	} catch (error) { // Si hay un error
         return {error: `an error has ocurred: ${error.message}`}; // Lo retornamos
     }

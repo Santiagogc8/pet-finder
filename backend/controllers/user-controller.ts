@@ -35,7 +35,10 @@ async function registerUser(data: userData) {
 
         if(registerStatus === newUserId){ // Si el estado de registro nos devuelve el mismo id
 			await t.commit(); // Guardamos la transaccion si sale todo bien
-            return registerStatus // Lo retornamos
+            return { // Retornamos informacion que no comprometa al usuario
+				userId: newUserId,
+				email
+			}
         } else { // Si no
 			await t.rollback(); // Deshace todo lo de la transaccion
             return registerStatus // Retornamos el estado

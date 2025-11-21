@@ -5,6 +5,10 @@ import * as path from "path";
 import "dotenv/config";
 import { sequelize } from "../db";
 
+// Controllers
+import { registerUser } from "../controllers/user-controller";
+import { authLogIn } from "../controllers/auth-controller";
+
 const port = process.env.PORT; // Establecemos el puerto recuperado de las variables de entorno
 const app = express(); // Inicializamos express
 
@@ -13,20 +17,42 @@ app.use(express.json()); // Y que usara el middleware de json de express para re
 
 // sequelize.sync({force: true}).then(e => e)
 
-app.get("/test", async (req, res) => {
-    res.json({ok: true})
+app.post("/auth", async (req, res) => {
+	const body = req.body;
+
+	if (!body) throw new Error("request body was expected");
+
+	try {
+		const registerRes = await registerUser(body);
+		res.json(registerRes);
+	} catch (error) {
+		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+	}
+});
+
+app.post("/auth/token", async (req, res) => {
+	const { email, password } = req.body;
+
+	if (!email || !password) throw new Error("password and email required");
+
+	try {
+		const token = await authLogIn(email, password);
+		res.json({ token });
+	} catch (error) {
+		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+	}
 });
 
 // Determinamos la ruta absoluta (desde el dist del backend) a la carpeta 'dist' del frontend
 // __dirname es 'desafio-integrador-4/backend/dist/api'. Subimos (..) y entramos a 'dist'. Subimos otro nivel y entramos a 'backend'. Por ultimo, subimos el ultimo nivel y entramos a 'pet-finder'
-const staticPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
+const staticPath = path.join(__dirname, "..", "..", "..", "client", "dist");
 
 // Usamos express.static para servir la carpeta compilada
 app.use(express.static(staticPath));
 
 // SPA FALLBACK: Redirigimos todas las demás rutas a index.html
-app.get('/{*any}', (req, res) => {
-    res.sendFile(path.join(staticPath, 'index.html'));
+app.get("/{*any}", (req, res) => {
+	res.sendFile(path.join(staticPath, "index.html"));
 });
 
 app.listen(port, () => {
