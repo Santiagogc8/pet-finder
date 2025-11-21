@@ -17,28 +17,38 @@ app.use(express.json()); // Y que usara el middleware de json de express para re
 
 // sequelize.sync({force: true}).then(e => e)
 
-app.post("/auth/register", async (req, res) => {
-	const body = req.body;
+// Sign Up
+// Creamos un endpoint para registrar
+app.post("/auth/signup", async (req, res) => {
+	const body = req.body; // Extraemos el body
 
+    // Si no recibimos nada en el body, tiramos 400
 	if (!body) return res.status(400).json({error: "body request was expected"})
 
-	try {
+	try { // Intentamos
+        // Pasarle a la funcion registerUser y esperar la respuesta
 		const registerRes = await registerUser(body);
-		res.json(registerRes);
-	} catch (error) {
+		res.json(registerRes); // Luego retornar la respuesta del registerUser
+	} catch (error) { // Si hay error
+        // Tiramos error con el mesaje del error
 		res.status(500).json({ error: `Error ocurred: ${error.message}` });
 	}
 });
 
-app.post("/auth/token", async (req, res) => {
-	const { email, password } = req.body;
+// Login
+// Creamos un endpoint para loguear un user
+app.post("/auth/login", async (req, res) => {
+	const { email, password } = req.body; // Tomamos el email y contraseña de la request
 
+    // Si no recibimos email o contraseña, tiramos 400
 	if (!email || !password) return res.status(400).json({error: "email and password was expected"})
 
-	try {
+	try { // Intentamos
+        // Ejecutar authLogIn con los parametros extraidos del req body y esperar la respuesta
 		const token = await authLogIn(email, password);
-		res.json({ token });
-	} catch (error) {
+		res.json({ token }); // Retornamos el token creado
+	} catch (error) { // Si hay error
+        // Tiramos error con el mesaje del error
 		res.status(500).json({ error: `Error ocurred: ${error.message}` });
 	}
 });
