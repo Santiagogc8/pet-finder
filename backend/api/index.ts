@@ -17,10 +17,10 @@ app.use(express.json()); // Y que usara el middleware de json de express para re
 
 // sequelize.sync({force: true}).then(e => e)
 
-app.post("/auth", async (req, res) => {
+app.post("/auth/register", async (req, res) => {
 	const body = req.body;
 
-	if (!body) throw new Error("request body was expected");
+	if (!body) return res.status(400).json({error: "body request was expected"})
 
 	try {
 		const registerRes = await registerUser(body);
@@ -33,7 +33,7 @@ app.post("/auth", async (req, res) => {
 app.post("/auth/token", async (req, res) => {
 	const { email, password } = req.body;
 
-	if (!email || !password) throw new Error("password and email required");
+	if (!email || !password) return res.status(400).json({error: "email and password was expected"})
 
 	try {
 		const token = await authLogIn(email, password);
