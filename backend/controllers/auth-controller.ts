@@ -2,6 +2,7 @@ import { Auth } from "../db/models";
 // import * as crypto from "crypto";
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt'
+import { Transaction } from "sequelize";
 
 // Extraemos el secret del .env
 const SECRET = process.env.SECRET;
@@ -13,8 +14,8 @@ async function getBcryptHash(text: string){
     return passHashed; // Retornamos el texto hasheado
 }
 
-// Creamos la funcion para autorizar un registro (recibimos email, password y userId)
-async function authRegister(email: string, password: string, userId: number) {
+// Creamos la funcion para autorizar un registro (recibimos email, password y userId. Tambien recibe una transaction de forma opcional que es de tipo Transaction de sequelize)
+async function authRegister(email: string, password: string, userId: number, transaction?: Transaction) {
 	try {
         // Hasheamos la contraseña recibida
         const passHashed = await getBcryptHash(password);
@@ -26,7 +27,8 @@ async function authRegister(email: string, password: string, userId: number) {
                 userId,
                 email,
                 password: passHashed // Convertimos la password en un bcrypt
-            }
+            },
+            transaction // Le decimos que su propiedad transaction es lo recibido en el parametro transaction
         });
 
         return auth.get('userId') // Retornamos el userId obtenido 

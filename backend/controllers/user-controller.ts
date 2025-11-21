@@ -1,4 +1,5 @@
 // Hacemos las importaciones de user y authRegister
+import { sequelize } from "../db";
 import { User } from "../db/user";
 import { authRegister } from "./auth-controller";
 
@@ -13,6 +14,7 @@ interface userData { // Definimos la interfaz de la data del user para que sea m
 // Creamos una funcion asincrona para registrar el user. Recibe una data del tipo userData
 async function registerUser(data: userData) {
 	const { name, email, password, lat, lng } = data; // Extraemos las propiedades de la data
+	const t = await sequelize.transaction(); // Esperamos la creacion de una transaccion
 
 	try { // Intentamos
 		const [user, userCreated] = await User.findOrCreate({ // Encontrar
@@ -23,16 +25,19 @@ async function registerUser(data: userData) {
 				lat,
 				lng,
 			},
+			transaction: t // Le definimos la propiedad transaction con la transaccion que guardamos en t
 		});
 
         const newUserId = user.get('id') as number; // Extrae el id del user creado o encontrado
 
-		// Y lo pasa por la funcion authRegister
-        const registerStatus = await authRegister(email, password, newUserId);
+		// Y lo pasa por la funcion authRegister (junto con la transaccion)
+        const registerStatus = await authRegister(email, password, newUserId, t);
 
         if(registerStatus === newUserId){ // Si el estado de registro nos devuelve el mismo id
+			await t.commit(); // Guardamos la transaccion si sale todo bien
             return registerStatus // Lo retornamos
         } else { // Si no
+			await t.rollback(); // Deshace todo lo de la transaccion
             return registerStatus // Retornamos el estado
         }
 	} catch (error) {
