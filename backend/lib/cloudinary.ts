@@ -1,17 +1,14 @@
-// Require the cloudinary library
+// Importamos todo v2 como cloudinary de la cloudinary library
 import { v2 as cloudinary } from "cloudinary";
 
-// Return "https" URLs by setting secure: true
+// Retornamos urls https por la configuracion secure: true
 cloudinary.config({
 	secure: true,
 });
 
-// Log the configuration
-console.log(cloudinary.config());
-
-const uploadImage = async (imagePath) => {
-	// Use the uploaded file's name as the asset's public ID and
-	// allow overwriting the asset with new versions
+const uploadImage = async (imagePath: string) => {
+	// Utilizar el nombre del archivo subido como ID público del recurso y
+    // permitir sobrescribir el recurso con nuevas versiones
 	const options = {
 		use_filename: true,
 		unique_filename: false,
@@ -19,11 +16,16 @@ const uploadImage = async (imagePath) => {
 	};
 
 	try {
-		// Upload the image
+		// Sube la imagen
 		const result = await cloudinary.uploader.upload(imagePath, options);
-		console.log(result);
-		return result.public_id;
+		return result.secure_url; // Retorna la url segura
 	} catch (error) {
-		console.error(error);
+		// Si hay un error
+		// Intentamos devolver el mensaje, o el error completo si no hay mensaje
+        const errorMessage = error.message || JSON.stringify(error) || "Error desconocido";
+        
+        return { error: errorMessage };
 	}
 };
+
+export { uploadImage }
