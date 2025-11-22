@@ -49,4 +49,11 @@ async function registerUser(data: userData) {
 	}
 }
 
-export { registerUser };
+// Creamos una funcion que nos extraera la informacion de un usuario. Recibe un id
+async function getUserById(id: number) {
+	// Obtiene un User por su PK y le pasa el id
+	const userData = await User.findByPk(id);
+	return userData; // Y lo devuelve
+}
+
+export { registerUser, getUserById };

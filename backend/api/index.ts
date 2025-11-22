@@ -7,7 +7,7 @@ import { sequelize } from "../db";
 import { Request, Response, NextFunction } from 'express'; // Importaciones para el middleware
 
 // Controllers
-import { registerUser } from "../controllers/user-controller";
+import { registerUser, getUserById } from "../controllers/user-controller";
 import { authLogIn, verifyToken } from "../controllers/auth-controller";
 
 const port = process.env.PORT; // Establecemos el puerto recuperado de las variables de entorno
@@ -80,7 +80,9 @@ app.get("/me", authMiddleware, async (req, res) =>{
     try{ // Intentamos
         const tokenRes = verifyToken(token); // Verificar el token recibido
         if(tokenRes){ // Si el token no devuelve null
-            return res.json(tokenRes) // Respondemos con lo recibido
+            // Llamamos a la funcion que nos obtiene un usuario por su PK y le pasamos el id de tokenRes
+            const userData = await getUserById(tokenRes.id);
+            return res.json(userData) // Respondemos con la data del usuario recibido
         } else{ // Caso contrario
             // Tiramos un 401
             return res.status(401).json({error: "token invalid"}) 
