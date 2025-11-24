@@ -43,4 +43,17 @@ async function createPet(userId: number, petData: PetData) {
 	}
 }
 
-export { createPet };
+async function getPetById(petId: number) {
+    try{
+        const petFind = await Pet.findByPk(petId);
+
+        if(!petFind) throw new Error('pet not found')
+
+        return petFind
+    } catch (error) {
+		// Si hay un error
+		return { error: `${error.message}` }; // Lo retornamos
+	}
+}
+
+export { createPet, getPetById };

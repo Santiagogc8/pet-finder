@@ -4,6 +4,7 @@ import { sequelize } from ".";
 export class Report extends Model {}
 
 Report.init({
+    name : DataTypes.STRING,
     lastSeen: {
         type: DataTypes.DATE,
         allowNull: false // No recibe null
