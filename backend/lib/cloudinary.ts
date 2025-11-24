@@ -19,8 +19,14 @@ const uploadImage = async (imagePath: string) => {
 		// Sube la imagen
 		const result = await cloudinary.uploader.upload(imagePath, options);
 		return result.secure_url; // Retorna la url segura
-	} catch (error) {
+	} catch (error: any) {
 		// Si hay un error
+
+		// Si el codigo del error es ENOENT
+		if(error.code === 'ENOENT'){
+			return { error: 'not image received' }; // Tiramos un error de que no recibimos una imagen
+		}
+
 		// Intentamos devolver el mensaje, o el error completo si no hay mensaje
         const errorMessage = error.message || JSON.stringify(error) || "Error desconocido";
         
