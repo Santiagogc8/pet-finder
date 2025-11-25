@@ -4,7 +4,6 @@ import cors from "cors";
 import * as path from "path";
 import "dotenv/config";
 import { sequelize } from "../db";
-import { Request, Response, NextFunction } from "express"; // Importaciones para el middleware
 
 // Controllers
 import { registerUser, getUserById } from "../controllers/user-controller";
@@ -12,26 +11,14 @@ import { authLogIn, verifyToken } from "../controllers/auth-controller";
 import { createPet } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
 
+// Middlewares
+import { authMiddleware, validateUser } from "../middlewares/middlewares";
+
 const port = process.env.PORT; // Establecemos el puerto recuperado de las variables de entorno
 const app = express(); // Inicializamos express
 
 app.use(cors()); // Le decimos que la app usara el middleware de cors
 app.use(express.json()); // Y que usara el middleware de json de express para recibir peticiones
-
-// Creamos un middleWare para obtener el authorization del header. Recibe el req, el res y la funcion next
-function authMiddleware(req: Request, res: Response, next: NextFunction) {
-	const headerAuth = req.get("Authorization"); // Obtenemos el header Authorization
-
-	// Si no se recibio, tiramos error
-	if (!headerAuth) return res.status(401).json({ error: "not token provided" });
-
-	// Partimos el token cuando haya un espacio y accedemos a la posicion 1 del array devuelto
-	const token = headerAuth.split(" ")[1];
-	if (!token) return res.status(401).json({ error: "token malformed" }); // Si el token es algo raro, tiramos error
-
-	req.token = token; // Guardamos el token en req.token
-	next(); // Continuamos el flujo
-}
 
 // sequelize.sync({force: true}).then(e => e)
 sequelize.sync({alter: true}).then(e => e)
@@ -136,7 +123,7 @@ app.post("/pets", authMiddleware, async (req, res) => {
 	}
 });
 
-app.post("/report", async (req, res) => {
+app.post("/report", validateUser, async (req, res) => {
 	const body = req.body;
 
 	try{
