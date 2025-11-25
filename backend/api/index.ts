@@ -124,9 +124,17 @@ app.post("/pets", authMiddleware, async (req, res) => {
 });
 
 app.post("/report", validateUser, async (req, res) => {
-	const body = req.body;
+	let body = req.body;
+	const token = req.token;
 
 	try{
+		if(token){
+			const resToken = verifyToken(token);
+			const resUserById = await getUserById(resToken.id) as any;
+
+			body = { ...req.body, name: resUserById.name };
+		}
+		
 		const reportCreated = await createReport(body);
 
 		if(reportCreated.error){
