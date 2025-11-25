@@ -9,28 +9,33 @@ interface ReportData {
     lat: number;
     lng: number;
     message: string;
+    petId: number;
 }
 
-async function createReport(petId: number, data: ReportData) {
+async function createReport(data: ReportData) {
     try{
-        const petFind= await getPetById(petId) as any;
+        if(!data.petId) throw new Error('petId is required');
+
+        const reporterName = data.name || 'anonymous';
+
+        const petFind = await getPetById(data.petId) as any;
 
         if(petFind.error) return petFind.error;
 
-        const findReport = await Report.findOne({ where: {name: data.name, message: data.message, lastSeen: data.lastSeen}})
+        const findReport = await Report.findOne({ where: {name: reporterName, message: data.message, lastSeen: data.lastSeen}})
 
         if(findReport){
             throw new Error('you cannot post 2 identical reports')
         } else {
             const reportCreated = await Report.create(
                 {
-                    name: data.name || 'anonymous',
+                    name: reporterName,
                     lastSeen: data.lastSeen,
                     phone: data.phone,
                     lat: data.lat,
                     lng: data.lng,
                     message: data.message,
-                    PetId: petId
+                    PetId: data.petId
                 }
             )
 

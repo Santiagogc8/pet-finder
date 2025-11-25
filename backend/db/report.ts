@@ -9,7 +9,7 @@ Report.init({
         type: DataTypes.DATE,
         allowNull: false // No recibe null
     },
-    reporterPhone: {
+    phone: {
         type: DataTypes.STRING,
         allowNull: false
     },
