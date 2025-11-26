@@ -2,6 +2,7 @@
 import { Pet } from "../db/pet";
 import { User } from "../db/user";
 import { uploadImage } from "../lib/cloudinary";
+import { client, indexName } from "../lib/algolia";
 
 interface PetData {
 	name: string;
@@ -41,6 +42,23 @@ async function createPet(userId: number, petData: PetData) {
 				imageUrl: cloudinaryImgSecureUrl,
 				UserId: userId,
 			});
+
+            const petId = await petCreated.get('id'); // Luego obtenemos el id del petCreated
+
+            const record = {  // Creamos un record para algolia
+                objectID: petId.toString(), // Le pasamos el id en string
+                name: petData.name, // El nombre
+                "_geoloc": { // Y la geolocalizacion
+                    "lat": petData.lat,
+                    "lng": petData.lng
+                }
+            };
+
+            // Agregamos el record al indice con saveObject
+            const { taskID } = await client.saveObject({
+                indexName, // En el indexName
+                body: record, // Y con el record creado como body
+            });
 
 			return await petCreated; // Retornamos la mascota creada
 		}

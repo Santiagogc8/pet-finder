@@ -21,7 +21,7 @@ app.use(cors()); // Le decimos que la app usara el middleware de cors
 app.use(express.json()); // Y que usara el middleware de json de express para recibir peticiones
 
 // sequelize.sync({force: true}).then(e => e)
-sequelize.sync({alter: true}).then(e => e)
+// sequelize.sync({alter: true}).then(e => e)
 
 // Sign Up
 // Creamos un endpoint para registrar
@@ -137,7 +137,7 @@ app.post("/report", validateUser, async (req, res) => {
 			// Y cambiamos la propiedad name del body recibido
 			body = { ...req.body, name: resUserById.name };
 
-			
+
 		}
 		
 		// Luego esperamos la creacion del reporte y le pasamos el body
