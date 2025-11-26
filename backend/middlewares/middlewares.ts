@@ -15,13 +15,14 @@ function authMiddleware(req: Request, res: Response, next: NextFunction) {
     next(); // Continuamos el flujo
 }
 
+// Creamos un middleware para validar usuarios o retornar null (para el reporte anonimo)
 function validateUser(req: Request, res: Response, next: NextFunction){
     const headerAuth = req.get("Authorization"); // Obtenemos el header Authorization
 
-    // Si no se recibio, devolvemos not logued
+    // Si no se recibio, devolvemos null
     if (!headerAuth){
         req.token = null;
-        return next();
+        return next(); // Y seguimos con el flujo
     }
 
     // Partimos el token cuando haya un espacio y accedemos a la posicion 1 del array devuelto

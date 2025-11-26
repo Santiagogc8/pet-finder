@@ -123,24 +123,28 @@ app.post("/pets", authMiddleware, async (req, res) => {
 	}
 });
 
+// Creacion de report
+// Creamos un endpoint que nos ayudara a crear un nuevo reporte y le pasamos un middleware para que valide si se le paso un auth o no
 app.post("/report", validateUser, async (req, res) => {
-	let body = req.body;
-	const token = req.token;
+	let body = req.body; // Extraemos el body
+	const token = req.token; // Y extraemos el token de req.token (este puede traer el token o null)
 
-	try{
-		if(token){
-			const resToken = verifyToken(token);
-			const resUserById = await getUserById(resToken.id) as any;
+	try{ // Intentamos
+		if(token){ // Validar si recibimos el token
+			const resToken = verifyToken(token); // Y verificarlo
+			const resUserById = await getUserById(resToken.id) as any; // Luego bucamos el usuario con el id del resToken
 
+			// Y cambiamos la propiedad name del body recibido
 			body = { ...req.body, name: resUserById.name };
 		}
 		
+		// Luego esperamos la creacion del reporte y le pasamos el body
 		const reportCreated = await createReport(body);
 
-		if(reportCreated.error){
-			return res.status(400).json({error: reportCreated.error})
-		} else{
-			return res.json({reportCreated});
+		if(reportCreated.error){ // Si la creacion del reporte da error
+			return res.status(400).json({error: reportCreated.error}) // Tiramos un 400 con el error
+		} else{ // Si no
+			return res.json({reportCreated}); // Retornamos el reporte creado
 		}
 	} catch(error){
 		// Si hay error
