@@ -136,6 +136,8 @@ app.post("/report", validateUser, async (req, res) => {
 
 			// Y cambiamos la propiedad name del body recibido
 			body = { ...req.body, name: resUserById.name };
+
+			
 		}
 		
 		// Luego esperamos la creacion del reporte y le pasamos el body

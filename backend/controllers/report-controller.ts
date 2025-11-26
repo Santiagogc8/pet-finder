@@ -1,6 +1,7 @@
 // Importamos la clase report
 import { Report } from "../db/report";
-import { getPetById } from "./pet-controller";
+import { getPetById } from "./pet-controller"; // El controller de pet
+import { resend } from "../lib/resend"; // Y a resend
 
 interface ReportData {
 	// Creamos la interfaz de reportes
@@ -47,6 +48,30 @@ async function createReport(data: ReportData) {
 				message: data.message,
 				PetId: data.petId,
 			});
+
+            // Luego usamos resend para enviar un correo al usuario que es dueño de la mascota
+            resend.emails.send({
+                from: 'onboarding@resend.dev', // Enviamos el correo desde un dominio x
+                to: petFind.User.email, // Al email recibido de los atributos extraidos de petFind.User.email
+                subject: `Hay nueva informacion sobre ${petFind.name || 'tu mascota'}`, // Le ponemos el asunto
+                html: `
+                    <p>Alguien ha publicado un reporte sobre tu mascota</p>
+                    <ul>
+                        <li>
+                            <p><strong>Nombre del reportante: </strong>${reporterName}</p>
+                        </li>
+                        <li>
+                            <p><strong>Telefono del reportante: </strong>${data.phone}</p>
+                        </li>
+                        <li>
+                            <p><strong>Visto en: </strong><a href="https://www.google.com/maps?q=${data.lat},${data.lng}">Ver en el mapa</a></p>
+                        </li>
+                        <li>
+                            <p><strong>Mensaje del reportante: </strong>${data.message}</p>
+                        </li>
+                    </ul>
+                ` // Y el html con la informacion de la mascota
+            })
 
 			return reportCreated; // Y retornamos el report creado
 		}
