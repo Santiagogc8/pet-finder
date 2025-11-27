@@ -22,20 +22,12 @@ export class MyElement extends LitElement {
         // Un html con una navbar definida, el main content y un footer
         return html`
             <header>
-                <nav>
-                    <a href="/">Home</a> |
-                    <a href="/projects">Projects</a> |
-                    <a href="/about">About</a>
-                </nav>
+                <nav-bar></nav-bar>
             </header>
 
             <main>
                 ${this._routes.outlet()}
             </main>
-
-            <footer>
-                <p>Mi pie de página</p>
-            </footer>
         `;
     }
 }
