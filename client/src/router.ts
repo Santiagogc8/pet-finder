@@ -3,17 +3,23 @@ import { customElement } from 'lit/decorators.js';
 import { Router } from '@lit-labs/router';
 
 // Pages
-import './pages/home-page'
+import './pages/home-page';
 
-@customElement('my-root')
-export class MyElement extends LitElement {
+// Components
+import './components/nav'
+
+@customElement('my-root') // Definimos el elemento my-root donde el router pintara todo
+// Exportamos la clase MyElement que hereda de LitElement
+export class MyElement extends LitElement { 
     
     // 1. El router se instancia conectado al 'this' (el componente host)
     private _routes = new Router(this, [
         {path: '/', render: () => html`<home-page></home-page>`}
     ]);
 
+    // Y renderiza
     render() {
+        // Un html con una navbar definida, el main content y un footer
         return html`
             <header>
                 <nav>
