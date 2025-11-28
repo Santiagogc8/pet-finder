@@ -21,9 +21,7 @@ export class MyElement extends LitElement {
     render() {
         // Un html con una navbar definida, el main content y un footer
         return html`
-            <header>
-                <nav-bar></nav-bar>
-            </header>
+            <nav-bar></nav-bar>
 
             <main>
                 ${this._routes.outlet()}
