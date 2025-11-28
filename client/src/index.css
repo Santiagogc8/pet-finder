@@ -5,3 +5,9 @@ my-root{
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
+
+@media (max-width: 344px) {
+    my-root{
+        display: none;
+    }
+}

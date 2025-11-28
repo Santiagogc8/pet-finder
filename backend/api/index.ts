@@ -6,7 +6,7 @@ import "dotenv/config";
 import { sequelize } from "../db";
 
 // Controllers
-import { registerUser, getUserById } from "../controllers/user-controller";
+import { registerUser, getUserById, verifyUserExist } from "../controllers/user-controller";
 import { authLogIn, verifyToken } from "../controllers/auth-controller";
 import { createPet } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
@@ -21,7 +21,26 @@ app.use(cors()); // Le decimos que la app usara el middleware de cors
 app.use(express.json()); // Y que usara el middleware de json de express para recibir peticiones
 
 // sequelize.sync({force: true}).then(e => e)
-// sequelize.sync({alter: true}).then(e => e)
+sequelize.sync({alter: true}).then(e => e)
+
+// Buscar un email
+// Utilizamos un endpoint para buscar dentro de users un email. Para evitar exponer la data del usuario, usamos POST en vez de GET
+app.post('/auth/check-email', async (req, res) =>{
+	const { email } = req.body;
+	
+	if(!email) return res.status(400).json({error: 'an email was expected'});
+
+	try{ // Intentamos
+		// Llamar a verifyUserExist con el email recibido
+		const exist = await verifyUserExist(email);
+		// Respondemos: { exists: true } o { exists: false }
+		return res.json({exist}); 
+	} catch(error) {
+		// Si hay error
+		// Tiramos error con el mesaje del error
+		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+	}
+});
 
 // Sign Up
 // Creamos un endpoint para registrar

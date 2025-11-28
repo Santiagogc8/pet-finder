@@ -56,4 +56,11 @@ async function getUserById(id: number) {
 	return userData; // Y lo devuelve
 }
 
-export { registerUser, getUserById };
+async function verifyUserExist(email: string) {
+	// Usamo findOne. Si encuentra 1, devuelve true. Si no, false.
+	const exists = await User.findOne({where: { email }});
+
+	return !!exists; // El doble signo de exclamación convierte el objeto en booleano puro
+}
+
+export { registerUser, getUserById, verifyUserExist };
