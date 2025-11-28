@@ -9,6 +9,20 @@ class HomePage extends HTMLElement{
 		this.render(); // Y hacemos el render
 	}
 
+    async validateUser(email: string){
+        const res = await fetch('http://localhost:3000/'+'auth/check-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({email})
+        });
+
+        const data = await res.json();
+
+        return data.exists;
+    }
+
     render(){
         const section = document.createElement('section');
 
@@ -22,15 +36,32 @@ class HomePage extends HTMLElement{
                 <form>
                     <div class="form__inputs">
                         <label for="email" for="email">Email</label>
-                        <input id="email" placeholder="someone@example.com">
+                        <input type="email" id="email" placeholder="someone@example.com" required>
                     </div>
 
                     <button>Siguiente</button>
                 </form>
 
-                <p>¿Aun no tienes cuenta? <a href="#">Registrate</a></p>
+                <p>¿Aun no tienes cuenta? <a href="/register">Registrate</a></p>
             </div>
         `
+
+        const form = section.querySelector('form');
+
+        form?.addEventListener('submit', async (e)=>{
+            e.preventDefault();
+            const inputEmail = form.querySelector('#email') as HTMLInputElement;
+
+            const exists = await this.validateUser(inputEmail.value);
+
+            if(exists){
+                history.pushState({}, '', '/login');
+            } else {
+                history.pushState({}, '', '/register');
+            }
+
+            window.dispatchEvent(new PopStateEvent('popstate'));
+        })
 
         const style = document.createElement('style');
 
