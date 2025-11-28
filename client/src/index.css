@@ -1,5 +1,7 @@
 my-root{
     display: block; /* Tratamos al custom-element como block para que tenga altura y se pueda mostrar todo */
     min-height: 100vh;
-    background: linear-gradient(180deg, #fff, #DEF4F0);
+    background: linear-gradient(180deg, #fff, #DEF4F0 50%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
