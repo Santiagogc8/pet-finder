@@ -1,4 +1,5 @@
-class HomePage extends HTMLElement{
+// Componente de verificacion de usuario (existe en la db o no)
+class EntryPage extends HTMLElement{
     shadow: ShadowRoot;
     constructor(){
         super();
@@ -9,7 +10,9 @@ class HomePage extends HTMLElement{
 		this.render(); // Y hacemos el render
 	}
 
+    // Creamos una funcion que recibe un email
     async validateUser(email: string){
+        // Esperamos la respuesta del fetch y le pasamos el email
         const res = await fetch('http://localhost:3000/'+'auth/check-email', {
             method: 'POST',
             headers: {
@@ -18,9 +21,10 @@ class HomePage extends HTMLElement{
             body: JSON.stringify({email})
         });
 
+        // Convertimos la respuesta a json
         const data = await res.json();
 
-        return data.exists;
+        return data.exists; // Y retornamos el exists del data
     }
 
     render(){
@@ -48,19 +52,22 @@ class HomePage extends HTMLElement{
 
         const form = section.querySelector('form');
 
+        // Escuchamos el evento de submit del form
         form?.addEventListener('submit', async (e)=>{
-            e.preventDefault();
+            e.preventDefault(); // Prevenimos que recargue la pagina
             const inputEmail = form.querySelector('#email') as HTMLInputElement;
 
+            // Usamos la funcion validateUser con el email recibido del input
             const exists = await this.validateUser(inputEmail.value);
 
+            // Si exists es true
             if(exists){
-                history.pushState({}, '', '/login');
-            } else {
-                history.pushState({}, '', '/register');
+                history.pushState({}, '', '/login'); // Cambiamos la ruta de la pagina con /login
+            } else { // Si no
+                history.pushState({}, '', '/register'); // Cambiamos la ruta a /register
             }
 
-            window.dispatchEvent(new PopStateEvent('popstate'));
+            window.dispatchEvent(new PopStateEvent('popstate')); // Le decimos a la ventana que la ruta cambio
         })
 
         const style = document.createElement('style');
@@ -121,7 +128,7 @@ class HomePage extends HTMLElement{
                 font-family: "Poppins", sans-serif;
             }
 
-            .form__inputs input:hover{
+            .form__inputs input:focus{
                 outline: none;
                 box-shadow: 0 2px 2px #00000040;
             }
@@ -133,6 +140,11 @@ class HomePage extends HTMLElement{
                 color: white;
                 border: none;
                 border-radius: 4px;
+                font-size: 1rem;
+            }
+
+            form button:hover{
+                cursor: pointer;
             }
 
             .email__data a{
@@ -146,4 +158,4 @@ class HomePage extends HTMLElement{
     }
 }
 
-customElements.define('home-page', HomePage);
+customElements.define('entry-page', EntryPage);

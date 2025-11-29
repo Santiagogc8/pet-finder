@@ -3,7 +3,8 @@ import { customElement } from 'lit/decorators.js';
 import { Router } from '@lit-labs/router';
 
 // Pages
-import './pages/home-page';
+import './pages/entry-page';
+import './pages/login-page';
 
 // Components
 import './components/nav'
@@ -14,8 +15,8 @@ export class MyElement extends LitElement {
     
     // 1. El router se instancia conectado al 'this' (el componente host)
     private _routes = new Router(this, [
-        {path: '/', render: () => html`<home-page></home-page>`},
-        {path: '/login', render: () => html`<h1>login</h1>`},
+        {path: '/', render: () => html`<entry-page></entry-page>`},
+        {path: '/login', render: () => html`<login-page></login-page>`},
         {path: '/register', render: () => html`<h1>register</h1>`}
     ]);
 
