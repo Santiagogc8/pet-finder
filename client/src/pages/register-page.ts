@@ -1,4 +1,5 @@
 import { state } from "../state";
+import { getPositionFromDirection } from "../lib/mapbox";
 
 // Pagina de SignUp
 class RegisterPage extends HTMLElement {
