@@ -16,15 +16,14 @@ class RegisterPage extends HTMLElement {
 		return new Promise((resolve, reject) => {
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
-                    resolve({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                },
+					resolve({
+						lat: position.coords.latitude,
+						lng: position.coords.longitude,
+					});
+				},
 				(error) => {
-                    // locationRender()
-                    reject(error) // Si sale mal (o el usuario dice NO)
-                }
+					reject(error); // Si sale mal (o el usuario dice NO)
+				}
 			);
 		});
 	};
@@ -39,8 +38,8 @@ class RegisterPage extends HTMLElement {
 				name,
 				email,
 				password,
-                lat,
-                lng
+				lat,
+				lng,
 			}),
 		});
 
@@ -103,54 +102,63 @@ class RegisterPage extends HTMLElement {
 			}
 		});
 
+		const locationDiv = form?.querySelector(".form__inputs .hidden");
+		const locationDivBtn = locationDiv?.querySelector("button");
+        const locationInputContainer = locationDiv?.querySelector(".location");
+        const cityInput = locationInputContainer?.querySelector("#city") as HTMLInputElement;
+        const addressInput = locationInputContainer?.querySelector("#address") as HTMLInputElement;
+
+		locationDivBtn?.addEventListener("click", () => {
+			locationDivBtn.style.display = "none";
+			locationInputContainer?.classList.remove("hidden");
+			cityInput?.setAttribute("required", "");
+			addressInput?.setAttribute("required", "");
+		});
+
 		form?.addEventListener("submit", async (e) => {
 			e.preventDefault();
 
-            try{
+            let lat, lng;
+
+            // 1. ¿El usuario escribió algo manualmente?
+            if (cityInput.value && addressInput.value) {
+                // TODO: Convertir (Ciudad + Dirección) -> (Lat + Lng) usando una API
+            } else {
+                // 2. Si no, intentamos GPS
                 const coords = await this.getPosition() as any;
-
-                const name = emailInput.value.split("@")[0];
-                const response = await this.signUpUser(
-                    name,
-                    emailInput.value,
-                    passwordInput.value,
-                    coords.lat,
-                    coords.lng
-                );
-
-                if(response.error){
-                    alert('Ha ocurrido un error inesperado. Revisa la consola para mas detalles');
-                    return;
-                }
-                
-                // Si llegamos aquí, significa que NO hubo error y tenemos token
-                if (response.token) {
-                    // 1. Guardamos el token en el state
-                    state.setState({token: response.token})
-
-                    console.log("Token guardado. Redirigiendo...");
-                    
-                    // 2. Redirigimos al usuario (por ahora al home, luego al mapa)
-                    history.pushState({}, '', '/home');
-                    window.dispatchEvent(new PopStateEvent('popstate')); // Le decimos a la ventana que la ruta cambio
-                }
-
-            } catch(error: any){
-                console.log(error)
-                if(error.code){
-                    const locationDiv = form.querySelector('.form__inputs .hidden');
-                    const locationDivBtn = locationDiv?.querySelector('button');
-
-                    locationDivBtn?.addEventListener('click', ()=>{
-                        locationDivBtn.style.display = 'none';
-                        const locationInputContainer = locationDiv?.querySelector('.location');
-                        locationInputContainer?.classList.remove('hidden');
-                        locationInputContainer?.querySelector('#city')?.setAttribute('required', '')
-                        locationInputContainer?.querySelector('#address')?.setAttribute('required', '')
-                    })
-                }
-                return
+                lat = coords.lat;
+                lng = coords.lng;
             }
+
+			try {
+				const name = emailInput.value.split("@")[0];
+				const response = await this.signUpUser(name, emailInput.value, passwordInput.value, lat, lng);
+
+				if (response.error) {
+					alert(
+						"Ha ocurrido un error inesperado. Revisa la consola para mas detalles"
+					);
+					return;
+				}
+
+				// Si llegamos aquí, significa que NO hubo error y tenemos token
+				if (response.token) {
+					// 1. Guardamos el token en el state
+					state.setState({ token: response.token });
+
+					console.log("Token guardado. Redirigiendo...");
+
+					// 2. Redirigimos al usuario (por ahora al home, luego al mapa)
+					history.pushState({}, "", "/home");
+					window.dispatchEvent(new PopStateEvent("popstate")); // Le decimos a la ventana que la ruta cambio
+				}
+			} catch (error: any) {
+				console.log(error);
+				if (error.code) {
+                    locationDiv?.classList.remove('hidden');
+				}
+				return;
+			}
 		});
 
 		const style = document.createElement("style");
