@@ -1,3 +1,5 @@
+import { state } from "../state";
+
 // Pagina de SignUp
 class RegisterPage extends HTMLElement {
 	shadow: ShadowRoot;
@@ -109,8 +111,6 @@ class RegisterPage extends HTMLElement {
                     coords.lng
                 );
 
-                const token = response.token;
-
                 if(response.error){
                     alert('Ha ocurrido un error inesperado. Revisa la consola para mas detalles');
                     return;
@@ -118,8 +118,8 @@ class RegisterPage extends HTMLElement {
                 
                 // Si llegamos aquí, significa que NO hubo error y tenemos token
                 if (response.token) {
-                    // 1. Guardamos el token en el navegador
-                    localStorage.setItem("token", response.token);
+                    // 1. Guardamos el token en el state
+                    state.setState({token: response.token})
 
                     console.log("Token guardado. Redirigiendo...");
                     
