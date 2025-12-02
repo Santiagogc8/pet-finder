@@ -71,14 +71,21 @@ class RegisterPage extends HTMLElement {
                     <label for="confirm-password">Confirmar Password</label>
                     <input type="password" id="confirm-password" required autocomplete="off">
                 </div>
-                <p class="register__message hidden">Contraseña incorrecta</p>
-                <a href="#">Olvidé mi contraseña</a>
-                <button>Acceder</button>
+                <div class="form__inputs hidden">
+                    <button>Agregar mi ubicacion manualmente</button>
+                    <div class="location hidden">
+                        <label for="city">Ciudad</label>
+                        <input type="text" id="city" autocomplete="off">
+                        <label for="address">Direccion</label>
+                        <input type="text" id="address" autocomplete="off">
+                    </div>
+                </div>
+                <button id="submit" type="submit">Acceder</button>
             </form>
         `;
 
 		const form = section.querySelector("form");
-		const submitButton = form?.querySelector("button");
+		const submitButton = form?.querySelector("#submit") as HTMLButtonElement;
 		const emailInput = form?.querySelector("#email") as HTMLInputElement;
 		const passwordInput = form?.querySelector("#password") as HTMLInputElement;
 		const confirmPass = form?.querySelector("#confirm-password") as HTMLInputElement;
@@ -128,9 +135,20 @@ class RegisterPage extends HTMLElement {
                     window.dispatchEvent(new PopStateEvent('popstate')); // Le decimos a la ventana que la ruta cambio
                 }
 
-            } catch(error){
+            } catch(error: any){
                 console.log(error)
-                // render de fallback
+                if(error.code){
+                    const locationDiv = form.querySelector('.form__inputs .hidden');
+                    const locationDivBtn = locationDiv?.querySelector('button');
+
+                    locationDivBtn?.addEventListener('click', ()=>{
+                        locationDivBtn.style.display = 'none';
+                        const locationInputContainer = locationDiv?.querySelector('.location');
+                        locationInputContainer?.classList.remove('hidden');
+                        locationInputContainer?.querySelector('#city')?.setAttribute('required', '')
+                        locationInputContainer?.querySelector('#address')?.setAttribute('required', '')
+                    })
+                }
                 return
             }
 		});
