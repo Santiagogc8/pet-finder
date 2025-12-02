@@ -1,7 +1,7 @@
 // Hacemos las importaciones de user y authRegister
 import { sequelize } from "../db";
 import { User } from "../db/user";
-import { authRegister } from "./auth-controller";
+import { authRegister, generateToken } from "./auth-controller";
 
 interface userData { // Definimos la interfaz de la data del user para que sea mas sencillo de manejar
 	name: string;
@@ -35,10 +35,8 @@ async function registerUser(data: userData) {
 
         if(registerStatus === newUserId){ // Si el estado de registro nos devuelve el mismo id
 			await t.commit(); // Guardamos la transaccion si sale todo bien
-            return { // Retornamos informacion que no comprometa al usuario
-				userId: newUserId,
-				email
-			}
+			const token = generateToken(newUserId)
+            return { token }
         } else { // Si no
 			await t.rollback(); // Deshace todo lo de la transaccion
             return registerStatus // Retornamos el estado

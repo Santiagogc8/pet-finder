@@ -39,7 +39,7 @@ class LogInPage extends HTMLElement {
                     <input type="email" id="email" placeholder="someone@example.com" required>
                 </div>
                 <div class="form__inputs">
-                    <label for="password" for="password">Password</label>
+                    <label for="password">Password</label>
                     <input type="password" id="password" required autocomplete="off">
                 </div>
                 <p class="login__message hidden">Contraseña incorrecta</p>
@@ -65,7 +65,7 @@ class LogInPage extends HTMLElement {
             if(token.error){
                 form.querySelector('.login__message')?.classList.remove('hidden')
             } else{
-                console.log('Hola mostro')
+                console.log('Hola, bienvenido')
                 console.log(token)
             }
         })

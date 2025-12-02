@@ -5,6 +5,7 @@ import { Router } from '@lit-labs/router';
 // Pages
 import './pages/entry-page';
 import './pages/login-page';
+import './pages/register-page';
 
 // Components
 import './components/nav'
@@ -17,7 +18,7 @@ export class MyElement extends LitElement {
     private _routes = new Router(this, [
         {path: '/', render: () => html`<entry-page></entry-page>`},
         {path: '/login', render: () => html`<login-page></login-page>`},
-        {path: '/register', render: () => html`<h1>register</h1>`}
+        {path: '/register', render: () => html`<register-page></register-page>`}
     ]);
 
     // Y renderiza

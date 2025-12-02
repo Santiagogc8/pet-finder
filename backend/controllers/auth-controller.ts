@@ -49,7 +49,7 @@ async function authLogIn(email: string, password: string) {
         // Verificamos si la comparacion del password recibido y el password guardado en la db son iguales
         if(await bcrypt.compare(password, findAuthPassword)){
             // Creamos un token con jwt guardando el id
-            const token = jwt.sign({id: findAuth.get('userId')}, SECRET);
+            const token = generateToken(findAuth.get('userId') as number)
             return token; // Y retornamos el token
         } else { // Si no encontro el user
             throw new Error('email or password incorrect'); // Tiramos error
@@ -57,6 +57,10 @@ async function authLogIn(email: string, password: string) {
     } catch(error){ // Si hay un error
         return {error: `an error has ocurred: ${error.message}`} // Lo retornamos
     }
+}
+
+function generateToken(userId: number){
+    return jwt.sign({id: userId}, SECRET);
 }
 
 // Verificar un token
@@ -68,4 +72,4 @@ function verifyToken(token: string){
     }
 }
 
-export { authRegister, authLogIn, verifyToken };
+export { authRegister, authLogIn, generateToken, verifyToken };
