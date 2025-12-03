@@ -1,5 +1,6 @@
 import { state } from "../state";
-import { getPositionFromDirection } from "../lib/mapbox";
+import { getPositionFromDirection } from "../lib/location";
+import { getPosition } from "../lib/location";
 
 // Pagina de SignUp
 class RegisterPage extends HTMLElement {
@@ -12,22 +13,6 @@ class RegisterPage extends HTMLElement {
 	connectedCallback() {
 		this.render(); // Renderizamos el componente
 	}
-
-	getPosition = () => {
-		return new Promise((resolve, reject) => {
-			navigator.geolocation.getCurrentPosition(
-				(position) => {
-					resolve({
-						lat: position.coords.latitude,
-						lng: position.coords.longitude,
-					});
-				},
-				(error) => {
-					reject(error); // Si sale mal (o el usuario dice NO)
-				}
-			);
-		});
-	};
 
 	async signUpUser(name: string, email: string, password: string, lat: number, lng: number) {
 		const res = await fetch("http://localhost:3000/" + "auth/signup", {
@@ -137,7 +122,7 @@ class RegisterPage extends HTMLElement {
 
                 } else {
                     // 2. Si no, intentamos GPS
-                    const coords = await this.getPosition() as any;
+                    const coords = await getPosition() as any;
                     lat = coords.lat;
                     lng = coords.lng;
                 }
