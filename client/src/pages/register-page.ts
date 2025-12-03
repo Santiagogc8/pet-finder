@@ -71,7 +71,7 @@ class RegisterPage extends HTMLElement {
                     <label for="confirm-password">Confirmar Password</label>
                     <input type="password" id="confirm-password" required autocomplete="off">
                 </div>
-                <div class="form__inputs hidden">
+                <div id="location-fallback" class="form__inputs hidden">
                     <button>Agregar mi ubicacion manualmente</button>
                     <div class="location hidden">
                         <label for="city">Ciudad</label>
@@ -89,6 +89,13 @@ class RegisterPage extends HTMLElement {
 		const emailInput = form?.querySelector("#email") as HTMLInputElement;
 		const passwordInput = form?.querySelector("#password") as HTMLInputElement;
 		const confirmPass = form?.querySelector("#confirm-password") as HTMLInputElement;
+        const cityInput = section.querySelector("#city") as HTMLInputElement;
+        const addressInput = section.querySelector("#address") as HTMLInputElement;
+
+        // Y para los contenedores visuales, seamos más específicos o directos:
+        const locationDiv = section.querySelector("#location-fallback");
+        const locationDivBtn = locationDiv?.querySelector("button");
+        const locationInputContainer = section.querySelector(".location");
 
 		submitButton?.setAttribute("disabled", "");
 		submitButton!.style.opacity = "0.5";
@@ -103,12 +110,6 @@ class RegisterPage extends HTMLElement {
 			}
 		});
 
-		const locationDiv = form?.querySelector(".form__inputs .hidden");
-		const locationDivBtn = locationDiv?.querySelector("button");
-        const locationInputContainer = locationDiv?.querySelector(".location");
-        const cityInput = locationInputContainer?.querySelector("#city") as HTMLInputElement;
-        const addressInput = locationInputContainer?.querySelector("#address") as HTMLInputElement;
-
 		locationDivBtn?.addEventListener("click", () => {
 			locationDivBtn.style.display = "none";
 			locationInputContainer?.classList.remove("hidden");
@@ -121,17 +122,26 @@ class RegisterPage extends HTMLElement {
 
             let lat, lng;
 
-            // 1. ¿El usuario escribió algo manualmente?
-            if (cityInput.value && addressInput.value) {
-                // TODO: Convertir (Ciudad + Dirección) -> (Lat + Lng) usando una API
-            } else {
-                // 2. Si no, intentamos GPS
-                const coords = await this.getPosition() as any;
-                lat = coords.lat;
-                lng = coords.lng;
-            }
-
 			try {
+                // 1. ¿El usuario escribió algo manualmente?
+                if (cityInput.value && addressInput.value) {
+                    const position = await getPositionFromDirection(cityInput.value, addressInput.value);
+
+                    if(position.lng && position.lat){
+                        lng = position.lng;
+                        lat = position.lat;
+                    } else {
+                        alert("No pudimos encontrar esa dirección. Intenta ser más específico.");
+                        return; // 🛑 Detenemos aquí para que no intente registrarse
+                    }
+
+                } else {
+                    // 2. Si no, intentamos GPS
+                    const coords = await this.getPosition() as any;
+                    lat = coords.lat;
+                    lng = coords.lng;
+                }
+
 				const name = emailInput.value.split("@")[0];
 				const response = await this.signUpUser(name, emailInput.value, passwordInput.value, lat, lng);
 
@@ -156,6 +166,7 @@ class RegisterPage extends HTMLElement {
 			} catch (error: any) {
 				console.log(error);
 				if (error.code) {
+                    console.log(error.code)
                     locationDiv?.classList.remove('hidden');
 				}
 				return;

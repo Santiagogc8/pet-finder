@@ -18,7 +18,8 @@ export class MyElement extends LitElement {
     private _routes = new Router(this, [
         {path: '/', render: () => html`<entry-page></entry-page>`},
         {path: '/login', render: () => html`<login-page></login-page>`},
-        {path: '/register', render: () => html`<register-page></register-page>`}
+        {path: '/register', render: () => html`<register-page></register-page>`},
+        {path: '/home', render: () => html`<h1>Home</h1>`}
     ]);
 
     // Y renderiza
