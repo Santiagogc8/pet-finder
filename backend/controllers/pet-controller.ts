@@ -68,7 +68,6 @@ async function createPet(userId: number, petData: PetData) {
 	}
 }
 
-
 // Creamos una funcion que nos obtiene una mascota por su id y el email de su dueño. Recibe un petId
 async function getPetById(petId: number) {
 	try { // Intentamos
@@ -88,4 +87,18 @@ async function getPetById(petId: number) {
 	}
 }
 
-export { createPet, getPetById };
+// Creamos una funcion para poder buscar mascotas cerca de una lat y lng en algolia
+async function searchPetsAround(lat: number, lng: number) {
+	const { results } = await client.search({ // Extraemos los results del search del cliente
+		requests: [{
+			indexName, // Le pasamos el indexName
+			aroundLatLng: `${lat}, ${lng}`, // Y el aroundLatLng en string
+			aroundRadius: 50000 // metros
+		}]
+	})
+
+	// Retornamos el results en la posicion 0 y mostramos sus hits
+	return (results[0] as any).hits;
+}
+
+export { createPet, getPetById, searchPetsAround };

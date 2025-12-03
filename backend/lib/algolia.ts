@@ -7,4 +7,4 @@ const indexName = "pets"; // Y establecemos el indexName
 
 const client = algoliasearch(appID, apiKey); // Inicializamos algolia con el appId y el apiKey
 
-export { client, indexName}; // Exportamos la inicializacion de algolia y el indexName
+export { client, indexName }; // Exportamos la inicializacion de algolia y el indexName

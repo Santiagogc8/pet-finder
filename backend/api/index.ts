@@ -8,7 +8,7 @@ import { sequelize } from "../db";
 // Controllers
 import { registerUser, getUserById, verifyUserExist } from "../controllers/user-controller";
 import { authLogIn, verifyToken } from "../controllers/auth-controller";
-import { createPet } from "../controllers/pet-controller";
+import { createPet, searchPetsAround } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
 
 // Middlewares
@@ -168,6 +168,26 @@ app.post("/report", validateUser, async (req, res) => {
 			return res.json({reportCreated}); // Retornamos el reporte creado
 		}
 	} catch(error){
+		// Si hay error
+		// Tiramos error con el mesaje del error
+		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+	}
+});
+
+// Obtener mascotas cerca de una ubicacion
+// Creamos un endpoint para poder encontrar mascotas cerca de una ubicacion
+app.get('/pets/around', async(req, res) => {
+	const { lat, lng } = req.query; // Extraemos el lat y lng de las querys
+
+	// Si no recibimos lat o lng, tiramos error
+	if(!lat || !lng) return res.status(400).json({ error: 'lat and lng was expected' });
+
+	try{ // Intentamos
+		// Hacer el searchPetsAround con lat y lng como floats
+		const petsArray = await searchPetsAround(parseFloat(lat as string), parseFloat(lng as string));
+
+		res.json({ pets: petsArray }) // Y responder con el array de mascotas encontradas
+	} catch(error) {
 		// Si hay error
 		// Tiramos error con el mesaje del error
 		res.status(500).json({ error: `Error ocurred: ${error.message}` });
