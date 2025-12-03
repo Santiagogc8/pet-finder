@@ -1,3 +1,5 @@
+import { state } from "../state";
+
 class HomePage extends HTMLElement{
     shadow: ShadowRoot;
 	constructor() {
@@ -6,7 +8,13 @@ class HomePage extends HTMLElement{
 	}
 
 	connectedCallback() {
-		this.render(); // Renderizamos el componente
+        const currentState = state.getState()
+        if(currentState.coords){
+            history.pushState({}, '', '/pets-around');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+        } else {
+            this.render(); // Renderizamos el componente
+        }
 	}
 
 	render() {

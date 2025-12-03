@@ -5,7 +5,8 @@ const state = {
 		auth: "" as string,
 		me: "" as string,
 		pets: [] as any,
-		token: null as any
+		token: null as any,
+		coords: null as any
 	},
 	listeners: [] as any[], // Guarda el array de callbacks (listeners)
 	getState() {

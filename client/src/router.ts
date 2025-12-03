@@ -20,7 +20,8 @@ export class MyElement extends LitElement {
         {path: '/', render: () => html`<entry-page></entry-page>`},
         {path: '/login', render: () => html`<login-page></login-page>`},
         {path: '/register', render: () => html`<register-page></register-page>`},
-        {path: '/home', render: () => html`<home-page></home-page>`}
+        {path: '/home', render: () => html`<home-page></home-page>`},
+        { path: '/pets-around', render: () => html`<pets-around-page></pets-around-page>` }
     ]);
 
     // Y renderiza

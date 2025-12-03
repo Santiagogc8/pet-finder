@@ -143,6 +143,7 @@ class RegisterPage extends HTMLElement {
                 }
 
 				const name = emailInput.value.split("@")[0];
+                state.setState({coords: { lat, lng }})
 				const response = await this.signUpUser(name, emailInput.value, passwordInput.value, lat, lng);
 
 				if (response.error) {
