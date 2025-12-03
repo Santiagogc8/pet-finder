@@ -6,6 +6,7 @@ import { Router } from '@lit-labs/router';
 import './pages/entry-page';
 import './pages/login-page';
 import './pages/register-page';
+import './pages/home-page';
 
 // Components
 import './components/nav'
@@ -19,7 +20,7 @@ export class MyElement extends LitElement {
         {path: '/', render: () => html`<entry-page></entry-page>`},
         {path: '/login', render: () => html`<login-page></login-page>`},
         {path: '/register', render: () => html`<register-page></register-page>`},
-        {path: '/home', render: () => html`<h1>Home</h1>`}
+        {path: '/home', render: () => html`<home-page></home-page>`}
     ]);
 
     // Y renderiza
