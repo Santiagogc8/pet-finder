@@ -15,6 +15,24 @@ async function getPositionFromDirection(city: string, address: string) {
 	};
 }
 
+async function getLocationFromCoords(lng: number, lat: number) {
+	const response = await fetch(
+		`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ`
+	);
+
+	const data = await response.json();
+	const tiposAceptados = ['neighborhood', 'locality', 'place'];
+
+	// 2. Buscamos en el array de features
+	const miLugar = data.features.find((feature: any) => {
+		// ¿El place_type de este feature está incluido en mi lista de aceptados?
+		const filter = feature.place_type.some((type: any) => tiposAceptados.includes(type));
+		return filter; 
+	});
+
+	return miLugar ? miLugar.place_name : "Ubicación desconocida";
+}
+
 function getPosition() {
 	return new Promise((resolve, reject) => {
 		navigator.geolocation.getCurrentPosition(
@@ -31,4 +49,4 @@ function getPosition() {
 	});
 }
 
-export { getPositionFromDirection, getPosition };
+export { getPositionFromDirection, getPosition, getLocationFromCoords };

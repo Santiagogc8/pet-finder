@@ -7,6 +7,7 @@ import './pages/entry-page';
 import './pages/login-page';
 import './pages/register-page';
 import './pages/home-page';
+import './pages/pets-around-page'
 
 // Components
 import './components/nav'
