@@ -67,7 +67,7 @@ class PetsAroundPage extends HTMLElement {
                 <div class="pet-card__info">
                     <h3>${pet.name}</h3>
                     <p>${pet.textLocation}</p>
-                    <a href="#">Reportar</a>
+                    <a href="#">Reportar </a>
                 </div>
             `
 
@@ -148,6 +148,12 @@ class PetsAroundPage extends HTMLElement {
                 text-decoration: none;
                 color: white;
                 border-radius: 4px;
+            }
+
+            .pet-card__info a::after{
+                content: url(https://res.cloudinary.com/drvtfag9j/image/upload/v1764823825/Siren_zqqihd.png);
+                display: inline-block; /* Para poder aplicar el vertical-align */
+                vertical-align: middle;
             }
         `
 
