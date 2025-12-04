@@ -45,7 +45,7 @@ class RegisterPage extends HTMLElement {
 
             <form>
                 <div class="form__inputs">
-                    <label for="email" for="email">Email</label>
+                    <label for="email">Email</label>
                     <input type="email" id="email" placeholder="someone@example.com" required>
                 </div>
                 <div class="form__inputs">
