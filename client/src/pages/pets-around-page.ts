@@ -15,10 +15,10 @@ class PetsAroundPage extends HTMLElement {
             const lat = currentState.coords.lat;
             const lng = currentState.coords.lng;
 
-            this.getPets(lat, lng);
             state.suscribe(() => { // Le pasamos una arrow function que ejecuta a render. De esta manera la toma, la guárdala, y  la ejecútala cuando el estado cambie
-                this.render()
+                this.render();
             });
+            this.getPets(lat, lng);
         } else {
             history.pushState({}, '', '/home');
             window.dispatchEvent(new PopStateEvent('popstate'));
@@ -26,21 +26,46 @@ class PetsAroundPage extends HTMLElement {
     }
 
     async getPets(lat: number, lng: number){
-        const response = await fetch(`http://localhost:3000/pets/around?lat=${lat}&lng=${lng}`);
-        const data = await response.json();
+        const currentState = state.getState();
 
-        const petsWithLocation = await Promise.all(
-            data.pets.map(async (pet: any) => {
-                const textLocation = await getLocationFromCoords(pet._geoloc.lng, pet._geoloc.lat);
+        state.setState({
+            petsFetching: {
+                ...currentState.petsFetching, // Copiamos lo que había (para no borrar pets o error)
+                isLoading: true,
+                error: null
+            }
+        });
+        
+        try{
+            const response = await fetch(`http://localhost:3000/pets/around?lat=${lat}&lng=${lng}`);
+            const data = await response.json();
 
-                return {
-                    ...pet, // Copia name, imgUrl, _geoloc, id, etc. automáticamente
-                    textLocation // Agrega la propiedad nueva
+            const petsWithLocation = await Promise.all(
+                data.pets.map(async (pet: any) => {
+                    const textLocation = await getLocationFromCoords(pet._geoloc.lng, pet._geoloc.lat);
+
+                    return {
+                        ...pet, // Copia name, imgUrl, _geoloc, id, etc. automáticamente
+                        textLocation // Agrega la propiedad nueva
+                    }
+                })
+            )
+
+            return state.setState({
+                petsFetching: {
+                    pets: petsWithLocation,
+                    isLoading: false
                 }
-            })
-        )
-
-        return state.setState({pets: petsWithLocation});
+            });
+        } catch(error){
+            // 3. ¡Ups! Avisamos del error
+            state.setState({ 
+                petsFetching: {
+                    error: "No pudimos conectar con el servidor", 
+                    isLoading: false 
+                }
+            });
+        }
     }
 
     openModal(petInfo: any){
@@ -110,29 +135,63 @@ class PetsAroundPage extends HTMLElement {
         petCardsContainer.classList.add('pets-card__container');
 
         section.appendChild(petCardsContainer)
-        const pets = state.getState().pets;
+        const stateData = state.getState();
+        const { pets, isLoading, error } = stateData.petsFetching;
 
-        pets.map((pet: any) => {
-            const card = document.createElement('div');
-            card.classList.add('pet-card');
+        // 2. Manejar el Loading
+        if (isLoading) {
+            section.innerHTML = `<h3>Cargando mascotas cercanas... 🐶⏳</h3>`;
+            
+            const style = document.createElement('style');
 
-            card.innerHTML = `
-                <img src="https://voca-land.sgp1.cdn.digitaloceanspaces.com/43844/1654148724932/a782407639e0a9fa0e1509391a3feb39414681de6795983c8e0d7c13670aa6f6.jpg">
-                <div class="pet-card__info">
-                    <h3>${pet.name}</h3>
-                    <p>${pet.textLocation}</p>
-                    <button id="report-btn">Reportar </button>
-                </div>
+            style.innerHTML = `
+                section{
+                    font-family: "Poppins", sans-serif;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 90%;
+                    margin: 0 auto;
+                }
+
+                section h3{
+                    font-size: 24px;
+                }
             `
 
-            const reportBtn = card.querySelector('#report-btn');
+            this.shadow.appendChild(section);
+            this.shadow.appendChild(style);
+            return; // Detenemos aquí para no pintar nada más
+        }
 
-            reportBtn?.addEventListener('click', () => {
-                this.openModal(pet);
-            })
+        if(error){
+            section.querySelector('h3')!.innerText = `${error}`
+        } else if (pets.length === 0) {
+            // Caso vacío
+            section.querySelector('h3')!.innerText = `No hay mascotas reportadas cerca de ti 🤷‍♂️`
+        } else {
+            pets.map((pet: any) => {
+                const card = document.createElement('div');
+                card.classList.add('pet-card');
 
-            petCardsContainer.appendChild(card);
-        });
+                card.innerHTML = `
+                    <img src="https://voca-land.sgp1.cdn.digitaloceanspaces.com/43844/1654148724932/a782407639e0a9fa0e1509391a3feb39414681de6795983c8e0d7c13670aa6f6.jpg">
+                    <div class="pet-card__info">
+                        <h3>${pet.name}</h3>
+                        <p>${pet.textLocation}</p>
+                        <button id="report-btn">Reportar </button>
+                    </div>
+                `
+
+                const reportBtn = card.querySelector('#report-btn');
+
+                reportBtn?.addEventListener('click', () => {
+                    this.openModal(pet);
+                })
+
+                petCardsContainer.appendChild(card);
+            });
+        }
 
         const backdropModal = section.querySelector('.modal-backdrop');
         const closeModalBtn = section.querySelector('.modal__close');
@@ -226,11 +285,9 @@ class PetsAroundPage extends HTMLElement {
                 left: 0;
                 width: 100vw;
                 height: 100vh;
-                background-color: rgba(0, 0, 0, 0); /* Fondo oscuro semitransparente */
-                backdrop-filter: blur(3px); /* 👈 ¡AQUÍ ESTÁ LA MAGIA DEL BLUR! */
-                z-index: 1000; /* Encima de todo */
-                
-                /* Para centrar el modal automáticamente */
+                background-color: rgba(0, 0, 0, 0);
+                backdrop-filter: blur(3px);
+                z-index: 100;
                 display: flex;
                 justify-content: center;
                 align-items: center;
