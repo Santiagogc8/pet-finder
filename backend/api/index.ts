@@ -154,7 +154,7 @@ app.post("/report", async (req, res) => {
 		if(reportCreated.error){ // Si la creacion del reporte da error
 			return res.status(400).json({error: reportCreated.error}) // Tiramos un 400 con el error
 		} else{ // Si no
-			return res.json({reportCreated}); // Retornamos el reporte creado
+			return res.json(reportCreated); // Retornamos el reporte creado
 		}
 	} catch(error){
 		// Si hay error

@@ -94,7 +94,7 @@ class PetsAroundPage extends HTMLElement {
                         </div>
                         <div class="form__inputs">
                             <label for="phone">Telefono</label>
-                            <input type="tel" id="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" autocomplete="off" required autocomplete="off">
+                            <input type="tel" id="phone" autocomplete="off" required autocomplete="off">
                         </div>
                         <div class="form__inputs">
                             <label for="where-see">¿Donde lo viste?</label>
@@ -263,6 +263,10 @@ class PetsAroundPage extends HTMLElement {
             .pet-card__report h4{
                 font-size: 36px;
                 margin: 20px 0;
+                text-align: center;
+            }
+
+            .pet-card__report p{
                 text-align: center;
             }
 

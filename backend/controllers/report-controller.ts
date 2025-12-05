@@ -27,7 +27,8 @@ async function createReport(data: ReportData) {
 		const findReport = await Report.findOne({
 			where: {
 				name: reporterName,
-				message: data.message
+				message: data.message,
+				PetId: data.petId
 			},
 		});
 
