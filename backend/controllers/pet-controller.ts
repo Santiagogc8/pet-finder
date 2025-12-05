@@ -48,6 +48,7 @@ async function createPet(userId: number, petData: PetData) {
             const record = {  // Creamos un record para algolia
                 objectID: petId.toString(), // Le pasamos el id en string
                 name: petData.name, // El nombre
+				imgUrl: cloudinaryImgSecureUrl,
                 "_geoloc": { // Y la geolocalizacion
                     "lat": petData.lat,
                     "lng": petData.lng

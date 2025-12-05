@@ -55,9 +55,23 @@ class PetsAroundPage extends HTMLElement {
         backdrop?.classList.remove('hidden');
     }
 
-    async sendReport(){
-        const form = this.shadow.querySelector('form');
-        
+    async sendReport(name: string, phone: string, message: string, petId: number){
+        const response = await fetch('http://localhost:3000/report', {
+            method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+            body: JSON.stringify({
+                name,
+                phone,
+                message,
+                petId
+            })
+        })
+
+        const data = await response.json();
+
+        return data;
     }
 
     render(){
@@ -83,8 +97,8 @@ class PetsAroundPage extends HTMLElement {
                             <input type="tel" id="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" autocomplete="off" required autocomplete="off">
                         </div>
                         <div class="form__inputs">
-                            <label for="name">¿Donde lo viste?</label>
-                            <textarea></textarea>
+                            <label for="where-see">¿Donde lo viste?</label>
+                            <textarea id="where-see"></textarea>
                         </div>
                         <button>Enviar informacion</button>
                     </form>
@@ -125,6 +139,42 @@ class PetsAroundPage extends HTMLElement {
 
         closeModalBtn?.addEventListener('click', () => {
             backdropModal?.classList.add('hidden');
+        });
+
+        const form = section.querySelector('form');
+
+        form?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nameInput = form.querySelector('#name') as HTMLInputElement;
+            const phoneInput = form.querySelector('#phone') as HTMLInputElement;
+            const messageTextArea = form.querySelector('#where-see') as HTMLTextAreaElement;
+            const petId = form.getAttribute('data-pet-id') as string;
+
+            const reportCreated = await this.sendReport(nameInput.value, phoneInput.value, messageTextArea.value, parseInt(petId));
+
+            if (reportCreated.createdAt) { // ✅ Éxito
+                // 1. Buscamos el contenedor del contenido del modal
+                const reportContainer = section.querySelector('.pet-card__report');
+                
+                // 2. Reemplazamos todo el formulario por el mensaje de éxito
+                if (reportContainer) {
+                    reportContainer.innerHTML = `
+                        <h4>¡Reporte enviado! 🚀</h4>
+                        <p>Gracias por ayudar a encontrar a esta mascota.</p>
+                    `;
+                }
+
+                // 3. Cerramos automáticamente después de 3 segundos
+                setTimeout(() => {
+                    const backdrop = section.querySelector('.modal-backdrop');
+                    backdrop?.classList.add('hidden');
+                    location.reload();
+                }, 3000);
+
+            } else { // ❌ Error
+                alert("Hubo un error: " + (reportCreated.error || "Intenta de nuevo"));
+            }
         })
 
         const style = document.createElement('style');
