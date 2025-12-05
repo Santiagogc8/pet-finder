@@ -5,20 +5,8 @@ export class Report extends Model {}
 
 Report.init({
     name : DataTypes.STRING,
-    lastSeen: {
-        type: DataTypes.DATE,
-        allowNull: false // No recibe null
-    },
     phone: {
         type: DataTypes.STRING,
-        allowNull: false
-    },
-    lat: {
-        type: DataTypes.FLOAT,
-        allowNull: false
-    },
-    lng: {
-        type: DataTypes.FLOAT,
         allowNull: false
     },
     message: DataTypes.TEXT

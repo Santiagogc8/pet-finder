@@ -44,23 +44,20 @@ class PetsAroundPage extends HTMLElement {
     }
 
     openModal(petInfo: any){
-        const backdropModal = this.shadow.querySelector('.modal-backdrop') as HTMLDivElement;
-        backdropModal?.classList.remove('hidden');
+        const backdrop = this.shadow.querySelector('.modal-backdrop');
+        const title = this.shadow.querySelector('h4');
 
-        const reportContainer = backdropModal?.querySelector('.pet-card__report');
+        const form = this.shadow.querySelector('form');
+        // 👇 Guardamos el ID "escondido" en el formulario
+        form?.setAttribute('data-pet-id', petInfo.objectID);
+        
+        title!.innerText = `Reportar info de ${petInfo.name}`; // Limpia y asigna
+        backdrop?.classList.remove('hidden');
+    }
 
-        reportContainer?.classList.remove('hidden');
-
-        const reportTitle = reportContainer?.querySelector('h4') as HTMLHeadingElement;
-        reportTitle.append(petInfo.name);
-
-        const closeModal = reportContainer?.querySelector('.modal__close');
-
-        closeModal?.addEventListener('click', () => {
-            reportContainer?.classList.add('hidden');
-            reportTitle!.innerText = 'Reportar info de '
-            backdropModal?.classList.add('hidden');
-        })
+    async sendReport(){
+        const form = this.shadow.querySelector('form');
+        
     }
 
     render(){
@@ -71,7 +68,7 @@ class PetsAroundPage extends HTMLElement {
         section.innerHTML = `
             <h3>Mascotas perdidas cerca</h3>
             <div class="modal-backdrop hidden">
-                <div class="pet-card__report hidden">
+                <div class="pet-card__report">
                     <a class="modal__close">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.207 6.207a1 1 0 0 0-1.414-1.414L12 10.586 6.207 4.793a1 1 0 0 0-1.414 1.414L10.586 12l-5.793 5.793a1 1 0 1 0 1.414 1.414L12 13.414l5.793 5.793a1 1 0 0 0 1.414-1.414L13.414 12l5.793-5.793z" fill="#fff"></path></g></svg>
                     </a>
@@ -122,6 +119,13 @@ class PetsAroundPage extends HTMLElement {
 
             petCardsContainer.appendChild(card);
         });
+
+        const backdropModal = section.querySelector('.modal-backdrop');
+        const closeModalBtn = section.querySelector('.modal__close');
+
+        closeModalBtn?.addEventListener('click', () => {
+            backdropModal?.classList.add('hidden');
+        })
 
         const style = document.createElement('style');
 

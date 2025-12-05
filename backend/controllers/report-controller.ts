@@ -6,10 +6,7 @@ import { resend } from "../lib/resend"; // Y a resend
 interface ReportData {
 	// Creamos la interfaz de reportes
 	name?: string;
-	lastSeen: string;
 	phone: number;
-	lat: number;
-	lng: number;
 	message: string;
 	petId: number;
 }
@@ -30,8 +27,7 @@ async function createReport(data: ReportData) {
 		const findReport = await Report.findOne({
 			where: {
 				name: reporterName,
-				message: data.message,
-				lastSeen: data.lastSeen,
+				message: data.message
 			},
 		});
 
@@ -41,10 +37,7 @@ async function createReport(data: ReportData) {
 		} else { // Si no
 			const reportCreated = await Report.create({ // Creamos el nuevo report
 				name: reporterName,
-				lastSeen: data.lastSeen,
 				phone: data.phone,
-				lat: data.lat,
-				lng: data.lng,
 				message: data.message,
 				PetId: data.petId,
 			});
@@ -62,9 +55,6 @@ async function createReport(data: ReportData) {
                         </li>
                         <li>
                             <p><strong>Telefono del reportante: </strong>${data.phone}</p>
-                        </li>
-                        <li>
-                            <p><strong>Visto en: </strong><a href="https://www.google.com/maps?q=${data.lat},${data.lng}">Ver en el mapa</a></p>
                         </li>
                         <li>
                             <p><strong>Mensaje del reportante: </strong>${data.message}</p>
