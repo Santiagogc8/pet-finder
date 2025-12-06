@@ -28,7 +28,7 @@ export class NavBar extends HTMLElement {
                 </a>
 
                 <div class="menu__links-container">
-                    <a>Mis datos</a>
+                    <a href="/me">Mis datos</a>
                     <a>Mis mascotas reportadas</a>
                     <a>Reportar mascotas</a>
                 </div>
@@ -139,6 +139,11 @@ export class NavBar extends HTMLElement {
                 width: 100%;
                 gap: 80px;
                 font-weight: 700;
+            }
+
+            .menu__links-container a{
+                color: white;
+                text-decoration: none;
             }
 
             .menu:not(.hidden)::before {

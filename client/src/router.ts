@@ -7,7 +7,8 @@ import './pages/entry-page';
 import './pages/login-page';
 import './pages/register-page';
 import './pages/home-page';
-import './pages/pets-around-page'
+import './pages/pets-around-page';
+import './pages/me-page';
 
 // Components
 import './components/nav'
@@ -22,7 +23,8 @@ export class MyElement extends LitElement {
         {path: '/login', render: () => html`<login-page></login-page>`},
         {path: '/register', render: () => html`<register-page></register-page>`},
         {path: '/home', render: () => html`<home-page></home-page>`},
-        { path: '/pets-around', render: () => html`<pets-around-page></pets-around-page>` }
+        { path: '/pets-around', render: () => html`<pets-around-page></pets-around-page>` },
+        { path: '/me', render: () => html`<me-page></me-page>` }
     ]);
 
     // Y renderiza
