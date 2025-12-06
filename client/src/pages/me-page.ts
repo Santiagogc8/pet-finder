@@ -9,11 +9,23 @@ class MePage extends HTMLElement {
     }
 
     connectedCallback(){
-        this.render();
+        const currentState = state.getState();
+
+        if(currentState.token){
+            state.suscribe(() => { // Le pasamos una arrow function que ejecuta a render. De esta manera la toma, la guárdala, y  la ejecútala cuando el estado cambie
+                this.render();
+            });
+            this.getUserInfo(currentState.token);
+        } else {
+            history.pushState({}, "", "/");
+			window.dispatchEvent(new PopStateEvent("popstate")); // Le decimos a la ventana que la ruta cambio
+        }
     }
 
-    async getUserInfo(){
-
+    async getUserInfo(token: string){
+        const response = fetch('', {
+            method: 'GET'
+        })
     }
 
     render(){
