@@ -3,10 +3,11 @@ import { sequelize } from "../db";
 import { User } from "../db/user";
 import { authRegister, generateToken } from "./auth-controller";
 
-interface userData { // Definimos la interfaz de la data del user para que sea mas sencillo de manejar
+interface userData {
+	// Definimos la interfaz de la data del user para que sea mas sencillo de manejar
 	name: string;
 	email: string;
-    password: string;
+	password: string;
 	lat: number;
 	lng: number;
 }
@@ -16,31 +17,36 @@ async function registerUser(data: userData) {
 	const { name, email, password, lat, lng } = data; // Extraemos las propiedades de la data
 	const t = await sequelize.transaction(); // Esperamos la creacion de una transaccion
 
-	try { // Intentamos
-		const [user, userCreated] = await User.findOrCreate({ // Encontrar
+	try {
+		// Intentamos
+		const [user, userCreated] = await User.findOrCreate({
+			// Encontrar
 			where: { email }, // El email recibido
-			defaults: { // Y si no lo encuentra, lo crea
+			defaults: {
+				// Y si no lo encuentra, lo crea
 				name,
 				email,
 				lat,
 				lng,
 			},
-			transaction: t // Le definimos la propiedad transaction con la transaccion que guardamos en t
+			transaction: t, // Le definimos la propiedad transaction con la transaccion que guardamos en t
 		});
 
-        const newUserId = user.get('id') as number; // Extrae el id del user creado o encontrado
+		const newUserId = user.get("id") as number; // Extrae el id del user creado o encontrado
 
 		// Y lo pasa por la funcion authRegister (junto con la transaccion)
-        const registerStatus = await authRegister(email, password, newUserId, t);
+		const registerStatus = await authRegister(email, password, newUserId, t);
 
-        if(registerStatus === newUserId){ // Si el estado de registro nos devuelve el mismo id
+		if (registerStatus === newUserId) {
+			// Si el estado de registro nos devuelve el mismo id
 			await t.commit(); // Guardamos la transaccion si sale todo bien
-			const token = generateToken(newUserId)
-            return { token }
-        } else { // Si no
+			const token = generateToken(newUserId);
+			return { token };
+		} else {
+			// Si no
 			await t.rollback(); // Deshace todo lo de la transaccion
-            return registerStatus // Retornamos el estado
-        }
+			return registerStatus; // Retornamos el estado
+		}
 	} catch (error) {
 		// Si hay un error
 		return { error: `an error has ocurred: ${error.message}` }; // Lo retornamos
@@ -56,9 +62,34 @@ async function getUserById(id: number) {
 
 async function verifyUserExist(email: string) {
 	// Usamo findOne. Si encuentra 1, devuelve true. Si no, false.
-	const exists = await User.findOne({where: { email }});
+	const exists = await User.findOne({ where: { email } });
 
 	return !!exists; // El doble signo de exclamación convierte el objeto en booleano puro
 }
 
-export { registerUser, getUserById, verifyUserExist };
+// Creamos una funcion que tiene una lista blanca donde validara cada espacio de la lista blanca y actualizara
+async function updateUserData(userId: number, newData: any) {
+    const allowedFields = ['name', 'lat', 'lng']; // Qué permitimos
+    const updateData: any = {}; // Donde guardaremos los datos que si enviaremos
+
+    // Recorremos la lista blanca (allowedFields)
+    allowedFields.forEach(field => {
+        // Si el dato viene en newData, lo copiamos
+        if (newData[field] !== undefined) {
+            updateData[field] = newData[field];
+        }
+    });
+
+	// Pasamos solo el objeto limpio
+		const [count] = await User.update(updateData, { 
+			where: { id: userId } 
+		});
+
+		if (count === 0) {
+			throw new Error('user not found');
+		}
+
+		return count;
+}
+
+export { registerUser, getUserById, verifyUserExist, updateUserData };

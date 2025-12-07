@@ -6,7 +6,7 @@ import "dotenv/config";
 import { sequelize } from "../db";
 
 // Controllers
-import { registerUser, getUserById, verifyUserExist } from "../controllers/user-controller";
+import { registerUser, getUserById, verifyUserExist, updateUserData } from "../controllers/user-controller";
 import { authLogIn, verifyToken } from "../controllers/auth-controller";
 import { createPet, searchPetsAround } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
@@ -110,6 +110,35 @@ app.get("/me", authMiddleware, async (req, res) => {
 		res.status(500).json({ error: `Error ocurred: ${error.message}` });
 	}
 });
+
+app.put(`/user`, authMiddleware, async (req, res) => {
+	const token = req.token; // Guardamos el token en una variable
+	const body = req.body;
+	
+	// Si no recibimos token, tiramos error
+	if (!token) return res.status(400).json({ error: "token was expected" });
+
+	const decodedToken = verifyToken(token);
+
+	if(decodedToken.error){
+		return res.status(401).json({ error: "unauthorized" });
+	} else {
+		const userId = decodedToken.userId
+
+		try {
+			const countLines = await updateUserData(userId, body);
+
+			return res.json({message: `${countLines} has been updated`})
+		} catch(error) {
+			// Si hay error
+			if(error.message == 'user not found'){
+				res.status(404).json({ error: `Error ocurred: ${error.message}` });
+			} else {
+				res.status(500).json({ error: `Error ocurred: ${error.message}` });
+			}
+		}
+	}
+})
 
 // Crear una mascota
 // Debemos verificar que el usuario si exista y luego crear la mascota con el id de este usuario
