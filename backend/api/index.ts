@@ -112,30 +112,24 @@ app.get("/me", authMiddleware, async (req, res) => {
 });
 
 app.put(`/user`, authMiddleware, async (req, res) => {
-	const token = req.token; // Guardamos el token en una variable
+	const payload = req.payload; // Guardamos el token en una variable
 	const body = req.body;
 	
 	// Si no recibimos token, tiramos error
-	if (!token) return res.status(400).json({ error: "token was expected" });
+	if (!payload) return res.status(401).json({ error: "unauthorized" });
 
-	const decodedToken = verifyToken(token);
+	const userId = payload.id
 
-	if(decodedToken.error){
-		return res.status(401).json({ error: "unauthorized" });
-	} else {
-		const userId = decodedToken.userId
+	try {
+		const countLines = await updateUserData(userId, body);
 
-		try {
-			const countLines = await updateUserData(userId, body);
-
-			return res.json({message: `${countLines} has been updated`})
-		} catch(error) {
-			// Si hay error
-			if(error.message == 'user not found'){
-				res.status(404).json({ error: `Error ocurred: ${error.message}` });
-			} else {
-				res.status(500).json({ error: `Error ocurred: ${error.message}` });
-			}
+		return res.json({message: `${countLines} has been updated`})
+	} catch(error) {
+		// Si hay error
+		if(error.message == 'user not found'){
+			res.status(404).json({ error: `Error ocurred: ${error.message}` });
+		} else {
+			res.status(500).json({ error: `Error ocurred: ${error.message}` });
 		}
 	}
 })
