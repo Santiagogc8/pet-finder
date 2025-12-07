@@ -86,24 +86,15 @@ app.post("/auth/login", async (req, res) => {
 // Obtener la informacion del usuario
 // Creamos el endpoint /me para obtener la informacion del usuario. Le pasamos el middleware authMiddleware
 app.get("/me", authMiddleware, async (req, res) => {
-	const token = req.token; // Guardamos el token en una variable
+	const payload = req.payload; // Guardamos el token en una variable
 
 	// Si no recibimos token, tiramos error
-	if (!token) return res.status(400).json({ error: "token was expected" });
+	if (!payload) return res.status(401).json({ error: "unauthorized" });
 
 	try {
 		// Intentamos
-		const tokenRes = verifyToken(token); // Verificar el token recibido
-		if (tokenRes) {
-			// Si el token no devuelve null
-			// Llamamos a la funcion que nos obtiene un usuario por su PK y le pasamos el id de tokenRes
-			const userData = await getUserById(tokenRes.id);
-			return res.json(userData); // Respondemos con la data del usuario recibido
-		} else {
-			// Caso contrario
-			// Tiramos un 401
-			return res.status(401).json({ error: "token invalid" });
-		}
+		const userData = await getUserById(payload.id);
+		return res.json(userData); // Respondemos con la data del usuario recibido
 	} catch (error) {
 		// Si hay error
 		// Tiramos error con el mesaje del error
@@ -137,27 +128,18 @@ app.put(`/user`, authMiddleware, async (req, res) => {
 // Crear una mascota
 // Debemos verificar que el usuario si exista y luego crear la mascota con el id de este usuario
 app.post("/pets", authMiddleware, async (req, res) => {
-    const token = req.token; // Guardamos el token en una variable
+    const payload = req.payload; // Guardamos el token en una variable
     const body = req.body;
 
 	// Si no recibimos token, tiramos error
-	if (!token) return res.status(400).json({ error: "token was expected" });
+	if (!payload) return res.status(401).json({ error: "unauthorized" });
 
     try {
 		// Intentamos
-		const tokenRes = verifyToken(token); // Verificar el token recibido
-		if (tokenRes) {
-			// Si el token no devuelve null
-			const petCreated = await createPet(tokenRes.id, body) as any;
-
-            if(petCreated.error) throw new Error(petCreated.error)
-
-            return res.json(petCreated);
-		} else {
-			// Caso contrario
-			// Tiramos un 401
-			return res.status(401).json({ error: "token invalid" });
-		}
+		// Si el token no devuelve null
+		const petCreated = await createPet(payload.id, body) as any;
+        if(petCreated.error) throw new Error(petCreated.error)
+        return res.json(petCreated);
 	} catch (error) {
 		// Si hay error
 		// Tiramos error con el mesaje del error
