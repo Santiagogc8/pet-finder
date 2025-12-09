@@ -102,7 +102,7 @@ app.get("/me", authMiddleware, async (req, res) => {
 	}
 });
 
-app.put(`/user`, authMiddleware, async (req, res) => {
+app.patch(`/user`, authMiddleware, async (req, res) => {
 	const payload = req.payload; // Guardamos el token en una variable
 	const body = req.body;
 	
