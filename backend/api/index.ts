@@ -7,7 +7,7 @@ import { sequelize } from "../db";
 
 // Controllers
 import { registerUser, getUserById, verifyUserExist, updateUserData } from "../controllers/user-controller";
-import { authLogIn, verifyToken } from "../controllers/auth-controller";
+import { authLogIn, verifyToken, updatePassword } from "../controllers/auth-controller";
 import { createPet, searchPetsAround } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
 
@@ -114,7 +114,7 @@ app.patch(`/user`, authMiddleware, async (req, res) => {
 	try {
 		const countLines = await updateUserData(userId, body);
 
-		return res.json({message: `${countLines} has been updated`})
+		return res.json({message: `${countLines} lines has been updated`})
 	} catch(error) {
 		// Si hay error
 		if(error.message == 'user not found'){
@@ -123,7 +123,36 @@ app.patch(`/user`, authMiddleware, async (req, res) => {
 			res.status(500).json({ error: `Error ocurred: ${error.message}` });
 		}
 	}
-})
+});
+
+app.patch('/user/auth', authMiddleware, async (req, res) => {
+	const payload = req.payload;
+	const { password } = req.body;
+
+	// Si no recibimos payload, tiramos error
+	if (!payload) return res.status(401).json({ error: "unauthorized" });
+
+	if(!password) return res.status(400).json({ error: "new password was required" });
+
+	const userId = payload.id;
+
+	try {
+		const countLines = await updatePassword(userId, password);
+
+		if(countLines === 0 ){
+			throw new Error('password cannot be updated');
+		}
+
+		return res.json({message: `password updated succesfully`});
+	} catch(error) {
+		// Si hay error
+		if(error.message == 'password cannot be updated'){
+			res.status(404).json({ error: `Error ocurred: ${error.message}` });
+		} else {
+			res.status(500).json({ error: `Error ocurred: ${error.message}` });
+		}
+	}
+});
 
 // Crear una mascota
 // Debemos verificar que el usuario si exista y luego crear la mascota con el id de este usuario
