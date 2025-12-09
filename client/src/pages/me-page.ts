@@ -23,13 +23,21 @@ class MePage extends HTMLElement {
     }
 
     async getUserInfo(token: string){
-        const response = fetch('', {
-            method: 'GET'
-        })
+        const response = await fetch('http://localhost:3000/me', {
+            method: 'GET',
+            headers: {
+				"Content-Type": "application/json",
+                "Authorization": `bearer ${token}`
+			},
+        });
+
+        const data = await response.json();
+
+        return state.setState({me: data})
     }
 
     render(){
-        const currentState = state.getState()
+        const currentState = state.getState();
 
         const section = document.createElement('section');
         section.innerHTML = `

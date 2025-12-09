@@ -3,15 +3,7 @@ const state = {
 	data: {
 		// Guardamos la data del estado en data
 		auth: "" as string,
-		me: {
-			id: 1,
-			name: "santiago",
-			email: "guzmansantiago833@gmail.com",
-			lat: 3.14,
-			lng: 3.14,
-			createdAt: "2025-12-05T04:10:45.847Z",
-			updatedAt: "2025-12-05T04:10:45.847Z"
-		} as any,
+		me: { } as any,
 		petsFetching: {
             pets: [] as any,
             isLoading: null,
