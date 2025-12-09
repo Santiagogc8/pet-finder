@@ -9,6 +9,8 @@ import './pages/register-page';
 import './pages/home-page';
 import './pages/pets-around-page';
 import './pages/me-page';
+import './pages/update-profile';
+import './pages/update-password';
 
 // Components
 import './components/nav'
@@ -23,8 +25,10 @@ export class MyElement extends LitElement {
         {path: '/login', render: () => html`<login-page></login-page>`},
         {path: '/register', render: () => html`<register-page></register-page>`},
         {path: '/home', render: () => html`<home-page></home-page>`},
-        { path: '/pets-around', render: () => html`<pets-around-page></pets-around-page>` },
-        { path: '/me', render: () => html`<me-page></me-page>` }
+        { path: '/pets-around', render: () => html`<pets-around-page></pets-around-page>`},
+        { path: '/me', render: () => html`<me-page></me-page>`},
+        { path: '/update-profile', render: () => html`<update-profile></update-profile>`},
+        { path: '/update-password', render: () => html`<update-password></update-password>`},
     ]);
 
     // Y renderiza

@@ -43,8 +43,8 @@ class MePage extends HTMLElement {
         section.innerHTML = `
             <h4>Mis datos</h4>
             <div class="buttons-container">
-                <a href="#">Modificar datos personales</a>
-                <a href="#">Modificar contraseña</a>
+                <a href="/update-profile">Modificar datos personales</a>
+                <a href="/update-password">Modificar contraseña</a>
             </div>
             <div class="my-data">
                 <p>${currentState.me.email || 'user'}</p>
