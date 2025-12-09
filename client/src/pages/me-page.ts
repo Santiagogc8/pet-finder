@@ -48,9 +48,21 @@ class MePage extends HTMLElement {
             </div>
             <div class="my-data">
                 <p>${currentState.me.email || 'user'}</p>
-                <a href="#">Cerrar sesion</a>
+                <a id="my-data-a" href="#">Cerrar sesion</a>
             </div>
         `
+
+        const myDataAnchor = section.querySelector("#my-data-a");
+
+        myDataAnchor?.addEventListener("click", (e) => {
+            const userConfirm = confirm('Estas seguro que quieres cerrar sesion?');
+
+            if(userConfirm){
+                state.setState({ });
+                localStorage.removeItem("petFinderState");
+                location.reload();
+            }
+        })
 
         const style = document.createElement('style');
         style.innerHTML = `
