@@ -33,6 +33,15 @@ async function getLocationFromCoords(lng: number, lat: number) {
 	return miLugar ? miLugar.place_name : "Ubicación desconocida";
 }
 
+async function getLocationFromQuery(query: string) {
+	const response = await fetch(
+		`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?access_token=pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ&limit=10`
+	);
+
+	const data = await response.json();
+	return data.features;
+}
+
 function getPosition() {
 	return new Promise((resolve, reject) => {
 		navigator.geolocation.getCurrentPosition(
@@ -49,4 +58,4 @@ function getPosition() {
 	});
 }
 
-export { getPositionFromDirection, getPosition, getLocationFromCoords };
+export { getPositionFromDirection, getPosition, getLocationFromCoords, getLocationFromQuery };

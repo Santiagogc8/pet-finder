@@ -9,7 +9,7 @@ const state = {
             isLoading: null,
             error: null
         },
-		token: null as any,
+		token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY0OTA3ODQ2fQ.FBd8kLDp8THfPLScGHPpliNqS8TYlhQmSFBW2wbOGRs" as any,
 		coords: {
 			lat: 4.65,
 			lng: -74.09

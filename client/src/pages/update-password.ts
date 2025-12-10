@@ -1,6 +1,6 @@
 import { state } from "../state";
 
-class updatePassword extends HTMLElement {
+class UpdatePassword extends HTMLElement {
     shadow: ShadowRoot;
 
     constructor(){
@@ -51,4 +51,4 @@ class updatePassword extends HTMLElement {
     }
 }
 
-customElements.define('update-password', updatePassword);
+customElements.define('update-password', UpdatePassword);
