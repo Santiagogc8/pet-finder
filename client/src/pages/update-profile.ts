@@ -1,25 +1,39 @@
 import { state } from "../state";
-import { getLocationFromQuery } from "../lib/location";
+import { getLocationFromQuery, getLocationFromCoords } from "../lib/location";
 
 class UpdateProfile extends HTMLElement {
     shadow: ShadowRoot;
     lat: number = 0;
     lng: number = 0;
+    location: string = "no establecida";
+    username: string = "username";
 
     constructor(){
         super();
         this.shadow = this.attachShadow({'mode': 'open'});
     }
 
-    connectedCallback(){
+    async connectedCallback(){
         const currentState = state.getState();
 
-        this.render();
+        if(currentState.token){
+            if(currentState.me.name && currentState.me.lng & currentState.me.lat){
+                this.location = await this.getLocationByCoords(currentState.me.lng, currentState.me.lat)
+                this.username = currentState.me.name;
+                this.render();
+            } else {
+                history.pushState({}, "", "/me");
+			    window.dispatchEvent(new PopStateEvent("popstate")); // Le decimos a la ventana que la ruta cambio
+            }
+        } else {
+            history.pushState({}, "", "/");
+			window.dispatchEvent(new PopStateEvent("popstate")); // Le decimos a la ventana que la ruta cambio
+        }
     }
 
-    async searchLocation(query: string) {
+    async searchLocationQuery(query: string) {
         try{
-            return getLocationFromQuery(query);
+            return await getLocationFromQuery(query);
         } catch(error){
             console.log(`Hubo un error ${error}`);
         }
@@ -44,6 +58,14 @@ class UpdateProfile extends HTMLElement {
         const resData = await response.json();
     }
 
+    async getLocationByCoords(lng: number, lat: number){
+        try{
+            return await getLocationFromCoords(lng, lat);
+        } catch(error){
+            console.log(`Hubo un error ${error}`);
+        }
+    }
+
     render(){
         const section = document.createElement('section');
         section.innerHTML = `
@@ -52,11 +74,23 @@ class UpdateProfile extends HTMLElement {
                 <div>
                     <div class="form__inputs">
                         <label for="name">Nombre</label>
-                        <input id="name" name="name" type="text" autocomplete="off">
+                        <input 
+                            id="name" 
+                            name="name" 
+                            type="text" 
+                            autocomplete="off"
+                            value="${this.username}"
+                            required>
                     </div>
                     <div class="form__inputs">
                         <label for="location">Ubicacion</label>
-                        <input id="location" name="location" type="text" autocomplete="off">
+                        <input 
+                            id="location" 
+                            name="location" 
+                            type="text" 
+                            autocomplete="off"
+                            value="${this.location}"
+                            required>
                         <ul class="search-results hidden"></ul>
                     </div>
                     </div>
@@ -84,7 +118,7 @@ class UpdateProfile extends HTMLElement {
                     return;
                 } else {
                     // Aquí llamaremos a la API
-                    const results = await this.searchLocation(query.trim());
+                    const results = await this.searchLocationQuery(query.trim());
                     searchResultsUl!.innerHTML = "";
                     searchResultsUl?.classList.remove('hidden');
 

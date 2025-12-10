@@ -39,6 +39,8 @@ class MePage extends HTMLElement {
     render(){
         const currentState = state.getState();
 
+        console.log(currentState.me)
+
         const section = document.createElement('section');
         section.innerHTML = `
             <h4>Mis datos</h4>
