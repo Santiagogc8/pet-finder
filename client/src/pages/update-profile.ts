@@ -3,6 +3,8 @@ import { getLocationFromQuery } from "../lib/location";
 
 class UpdateProfile extends HTMLElement {
     shadow: ShadowRoot;
+    lat: number = 0;
+    lng: number = 0;
 
     constructor(){
         super();
@@ -23,8 +25,23 @@ class UpdateProfile extends HTMLElement {
         }
     }
 
-    async sendNewProfileData(data: object){
+    async sendNewProfileData(data: any, token: string){
+        const { name, lng, lat } = data;
 
+        const response = await fetch("http://localhost:3000/user", {
+            method: 'PATCH',
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `bearer ${token}`
+            },
+            body: JSON.stringify({
+                name,
+                lng,
+                lat
+            })
+        });
+
+        const resData = await response.json();
     }
 
     render(){
@@ -40,17 +57,17 @@ class UpdateProfile extends HTMLElement {
                     <div class="form__inputs">
                         <label for="location">Ubicacion</label>
                         <input id="location" name="location" type="text" autocomplete="off">
-                        <ul class="search-results hidden">
-                        </ul>
+                        <ul class="search-results hidden"></ul>
                     </div>
                     </div>
-                <button type="submit">Guardar</button>
+                <button id="submit-btn" type="submit">Guardar</button>
             </form>
         `
 
-        const locationInput = section.querySelector("#location");
+        const locationInput = section.querySelector("#location") as HTMLInputElement;
         const searchResultsUl = section.querySelector(".search-results");
         let timeoutId: any; // Variable para guardar el timer
+        const submitBtn = section.querySelector("#submit-btn");
 
         locationInput?.addEventListener('input', (e) => {
             const query = (e.target as HTMLInputElement).value;
@@ -63,9 +80,8 @@ class UpdateProfile extends HTMLElement {
             // 2. Iniciamos un nuevo conteo
             timeoutId = setTimeout(async () => {
                 if(query.trim() === ""){
-                    console.log('nada mi bien')
                     searchResultsUl?.classList.add('hidden');
-                    return
+                    return;
                 } else {
                     // Aquí llamaremos a la API
                     const results = await this.searchLocation(query.trim());
@@ -75,11 +91,24 @@ class UpdateProfile extends HTMLElement {
                     results.forEach((result: any) => {
                         const newLi = document.createElement('li');
                         newLi.innerText = result.place_name;
+
+                        newLi.addEventListener("click", () => {
+                            console.log(result);
+                            locationInput.value = result.place_name;
+                            searchResultsUl?.classList.add('hidden');
+
+                            this.lng = result.geometry.coordinates[0];
+                            this.lat = result.geometry.coordinates[1];
+                        });
                         searchResultsUl?.appendChild(newLi)
                     });
                 }
             }, 700); // Esperamos 700ms
         });
+
+        submitBtn?.addEventListener("click", async (e) => {
+            e.preventDefault();
+        })
 
         const style = document.createElement('style');
         style.innerHTML = `
@@ -147,10 +176,6 @@ class UpdateProfile extends HTMLElement {
                 font-weight: 600;
             }
 
-            .hidden{
-                display: none;
-            }
-
             .search-results{
                 display: block;
                 background-color: white;
@@ -167,6 +192,10 @@ class UpdateProfile extends HTMLElement {
             .search-results li:hover{
                 background-color: #ededed;
                 cursor: pointer;
+            }
+
+            .hidden{
+                display: none;
             }
         `
 
