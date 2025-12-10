@@ -11,6 +11,8 @@ import './pages/pets-around-page';
 import './pages/me-page';
 import './pages/update-profile';
 import './pages/update-password';
+import './pages/reports-page';
+import './pages/create-report-page';
 
 // Components
 import './components/nav'
@@ -29,6 +31,8 @@ export class MyElement extends LitElement {
         { path: '/me', render: () => html`<me-page></me-page>`},
         { path: '/update-profile', render: () => html`<update-profile></update-profile>`},
         { path: '/update-password', render: () => html`<update-password></update-password>`},
+        { path: '/my-reports', render: () => html`<report-page></report-page>`},
+        { path: '/new-report', render: () => html`<create-report></create-report>`},
     ]);
 
     // Y renderiza

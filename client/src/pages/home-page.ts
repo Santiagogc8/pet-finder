@@ -1,4 +1,5 @@
 import { state } from "../state";
+import { getPosition } from "../lib/location";
 
 class HomePage extends HTMLElement{
     shadow: ShadowRoot;
@@ -25,10 +26,27 @@ class HomePage extends HTMLElement{
             <div class="home__info">
                 <h3>Pet Finder App</h3>
                 <p>Encuentra y reporta mascotas perdidas cerca de tu ubicación</p>
-                <button>Dar mi ubicación actual</button>
+                <button id="locationBtn">Dar mi ubicación actual</button>
                 <a href="#">¿Cómo funciona Pet Finder?</a>
             </div>
         `
+
+        const locationBtn = section.querySelector("#locationBtn");
+        
+        locationBtn?.addEventListener("click", async (e) => {
+            try{
+                const userLocation = await getPosition();
+                state.setState({coords: userLocation});
+                history.pushState({}, '', '/pets-around'); 
+                window.dispatchEvent(new PopStateEvent('popstate'));
+            } catch(error: any){
+                if(error.message.includes('denied')){
+                    alert("Para poder buscar las mascotas perdidas que hay cerca, necesitamos tu ubicacion");
+                } else {
+                    alert(`Ha ocurrido un error inesperado: ${error}`);
+                }
+            }
+        });
 
         const style = document.createElement('style');
 
