@@ -29,8 +29,8 @@ export class NavBar extends HTMLElement {
 
                 <div class="menu__links-container">
                     <a href="/me">Mis datos</a>
-                    <a>Mis mascotas reportadas</a>
-                    <a>Reportar mascotas</a>
+                    <a href="/my-reports">Mis mascotas reportadas</a>
+                    <a href="/new-report">Reportar mascotas</a>
                 </div>
 
                 <p>User email</p>

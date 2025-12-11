@@ -216,6 +216,13 @@ class CreateReportPage extends HTMLElement {
 			return await this.sendReportData(petReportData)
 		});
 
+		const cancelBtn = section.querySelector("#form__cancel")
+
+		cancelBtn?.addEventListener("click", () => {
+			history.pushState({}, "", "/home");
+			window.dispatchEvent(new PopStateEvent("popstate"));
+		})
+
 		const style = document.createElement("style");
 		style.innerHTML = `
             @import url('https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css');

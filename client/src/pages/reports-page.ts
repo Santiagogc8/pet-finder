@@ -12,9 +12,7 @@ class ReportPage extends HTMLElement {
         const currentState = state.getState();
 
         if(currentState.token){
-            state.suscribe(() => { // Le pasamos una arrow function que ejecuta a render. De esta manera la toma, la guárdala, y  la ejecútala cuando el estado cambie
-                this.render();
-            });
+            this.render();
         } else {
             history.pushState({}, "", "/");
 			window.dispatchEvent(new PopStateEvent("popstate")); // Le decimos a la ventana que la ruta cambio
@@ -26,6 +24,7 @@ class ReportPage extends HTMLElement {
 
         const section = document.createElement('section');
         section.innerHTML = `
+            <h4>Mascotas reportadas</h4>
         `
 
         const style = document.createElement('style');

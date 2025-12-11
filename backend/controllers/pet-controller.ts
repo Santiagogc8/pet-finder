@@ -102,4 +102,14 @@ async function searchPetsAround(lat: number, lng: number) {
 	return (results[0] as any).hits;
 }
 
-export { createPet, getPetById, searchPetsAround };
+async function getUserPets(userId: number) {
+	try{
+		const pets = await Pet.findAll({where: {UserId: userId}});
+		return pets;
+	} catch(error){
+		// Si hay un error
+		return { error: `${error.message}` }; // Lo retornamos
+	}
+}
+
+export { createPet, getPetById, searchPetsAround, getUserPets };
