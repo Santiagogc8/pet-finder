@@ -3,83 +3,119 @@ import { getLocationFromCoords } from "../lib/location";
 import mapboxgl from "mapbox-gl";
 
 class CreateReportPage extends HTMLElement {
-    shadow: ShadowRoot;
-    lat: number = 0;
-    lng: number = 0;
+	shadow: ShadowRoot;
+	lat: number = 0;
+	lng: number = 0;
 
-    constructor(){
-        super();
-        this.shadow = this.attachShadow({'mode': 'open'});
-    }
+	constructor() {
+		super();
+		this.shadow = this.attachShadow({ mode: "open" });
+	}
 
-    connectedCallback(){
-        const currentState = state.getState();
+	connectedCallback() {
+		const currentState = state.getState();
 
-        if(currentState.token){
-            this.render();
-        } else {
-            history.pushState({}, "", "/");
+		if (currentState.token) {
+			this.render();
+		} else {
+			history.pushState({}, "", "/");
 			window.dispatchEvent(new PopStateEvent("popstate")); // Le decimos a la ventana que la ruta cambio
-        }
-    }
+		}
+	}
 
-    initMap() {
-        const currentState = state.getState() as any;
+	initMap() {
+		const currentState = state.getState() as any;
 
-        let currentLng;
-        let currentLat;
+		let currentLng;
+		let currentLat;
 
-        currentLng = currentState.coords?.lng ? currentState.coords.lng : -74.09;
-        currentLat = currentState.coords?.lat ? currentState.coords.lat : 4.65;
+		currentLng = currentState.coords?.lng ? currentState.coords.lng : -74.09;
+		currentLat = currentState.coords?.lat ? currentState.coords.lat : 4.65;
 
-        // Buscamos el contenedor del mapa en nuestro Shadow DOM
-        const mapContainer = this.shadow.getElementById('map');
-        
-        mapboxgl.accessToken = 'pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ';
+		// Buscamos el contenedor del mapa en nuestro Shadow DOM
+		const mapContainer = this.shadow.getElementById("map");
 
-        // Inicializamos el mapa
-        const map = new mapboxgl.Map({
-            container: mapContainer as HTMLElement, // Referencia al div
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [currentLng, currentLat], // Coordenadas iniciales (ej. Bogotá)
-            zoom: 13
-        });
+		mapboxgl.accessToken =
+			"pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ";
 
-        // Agregamos el control de navegación (zoom, rotar)
-        map.addControl(new mapboxgl.NavigationControl());
+		// Inicializamos el mapa
+		const map = new mapboxgl.Map({
+			container: mapContainer as HTMLElement, // Referencia al div
+			style: "mapbox://styles/mapbox/streets-v11",
+			center: [currentLng, currentLat], // Coordenadas iniciales (ej. Bogotá)
+			zoom: 13,
+		});
 
-        // Variable para el marcador actual
-        let currentMarker: mapboxgl.Marker | null = null;
+		// Agregamos el control de navegación (zoom, rotar)
+		map.addControl(new mapboxgl.NavigationControl());
 
-        // Escuchamos el evento 'click' en el mapa
-        map.on('click', async (e) => {
-            const { lng, lat } = e.lngLat;
-            
-            // Guardamos las coordenadas en las propiedades de la clase
-            this.lat = lat;
-            this.lng = lng;
+		// Variable para el marcador actual
+		let currentMarker: mapboxgl.Marker | null = null;
 
-            // Si ya hay un marcador, lo borramos para poner el nuevo
-            if (currentMarker) {
-                currentMarker.remove();
-            }
+		// Escuchamos el evento 'click' en el mapa
+		map.on("click", async (e) => {
+			const { lng, lat } = e.lngLat;
 
-            // Ponemos el nuevo marcador visual
-            currentMarker = new mapboxgl.Marker()
-                .setLngLat([lng, lat])
-                .addTo(map);
+			// Guardamos las coordenadas en las propiedades de la clase
+			this.lat = lat;
+			this.lng = lng;
 
-            const petLocationInput = this.shadow.querySelector('#pet-location') as HTMLInputElement;
+			// Si ya hay un marcador, lo borramos para poner el nuevo
+			if (currentMarker) {
+				currentMarker.remove();
+			}
 
-            petLocationInput.value = await getLocationFromCoords(lng, lat);
-        });
-    }
+			// Ponemos el nuevo marcador visual
+			currentMarker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
 
-    render(){
-        const currentState = state.getState();
+			const petLocationInput = this.shadow.querySelector(
+				"#pet-location"
+			) as HTMLInputElement;
 
-        const section = document.createElement('section');
-        section.innerHTML = `
+			petLocationInput.value = await getLocationFromCoords(lng, lat);
+		});
+	}
+
+	async sendReportData(data: any) {
+		const currentState = state.getState();
+		const { name, lat, lng, imgUrl, lost } = data;
+
+		try {
+			const res = await fetch("http://localhost:3000/pets", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${currentState.token}`, // Importante: Token
+				},
+				body: JSON.stringify({
+					name,
+					lat,
+					lng,
+					imgUrl,
+					lost,
+				}),
+			});
+
+			const data = await res.json();
+
+			if (res.ok) {
+				alert("¡Mascota reportada con éxito!");
+				// Redirigimos a la página de mascotas cercanas o al perfil
+				history.pushState({}, "", "/pets-around");
+				window.dispatchEvent(new PopStateEvent("popstate"));
+			} else {
+				console.error("Error del servidor:", data);
+				alert(`Error al guardar: ${data.error || "Intenta nuevamente"}`);
+			}
+		} catch (error) {
+			console.error(error);
+			alert("Hubo un error de conexión.");
+		}
+	}
+
+	render() {
+		const section = document.createElement("section");
+		section.innerHTML = `
             <div class="pet-heading">
                 <h4>Reportar mascota</h4>
                 <p>Ingresa la siguiente información para realizar el reporte de la mascota</p>
@@ -104,7 +140,6 @@ class CreateReportPage extends HTMLElement {
                             name="pet-image" 
                             type="file" 
                             accept="image/*" 
-                            required
                             style="display: none;" 
                         >
                     </div>
@@ -124,35 +159,65 @@ class CreateReportPage extends HTMLElement {
                 <button type="submit" id="form__submit">Reportar mascota</button>
                 <button id="form__cancel">Cancelar</button>
             </form>
-        `
+        `;
 
-        const addPetPictureBtn = section.querySelector("#add-pet-picture");
-        const fileInput = section.querySelector("#pet-image") as HTMLInputElement;
-        const preview = section.querySelector(".picture-preview") as HTMLImageElement;
+		const addPetPictureBtn = section.querySelector("#add-pet-picture");
+		const fileInput = section.querySelector("#pet-image") as HTMLInputElement;
+		const preview = section.querySelector(".picture-preview") as HTMLImageElement;
 
-        // Al hacer clic en el cuadro gris, activamos el input oculto
-        addPetPictureBtn?.addEventListener("click", () => {
-            fileInput.click();
-        });
+		// Al hacer clic en el cuadro gris, activamos el input oculto
+		addPetPictureBtn?.addEventListener("click", () => {
+			fileInput.click();
+		});
 
-        // Cuando el usuario elige un archivo...
-        fileInput.addEventListener("change", () => {
-            const file = fileInput.files?.[0];
-            if (file) {
-                const reader = new FileReader();
-                
-                reader.onload = (e) => {
-                    const result = e.target?.result as string;
-                    // Mostramos la preview y ocultamos el texto
-                    preview.src = result;
-                };
+		// Cuando el usuario elige un archivo...
+		fileInput.addEventListener("change", () => {
+			const file = fileInput.files?.[0];
+			if (file) {
+				const reader = new FileReader();
 
-                reader.readAsDataURL(file);
-            }
-        });
+				reader.onload = (e) => {
+					const result = e.target?.result as string;
+					// Mostramos la preview y ocultamos el texto
+					preview.src = result;
+				};
 
-        const style = document.createElement('style');
-        style.innerHTML = `
+				reader.readAsDataURL(file);
+			}
+		});
+
+		const form = section.querySelector("#pet-report");
+
+		form?.addEventListener("submit", async (e) => {
+			e.preventDefault();
+
+			if (this.lat === 0 || this.lng === 0)
+				return alert(
+					"Debes seleccionar un lugar en el mapa antes de hacer el envio del reporte"
+				);
+
+			if (!fileInput.files?.[0]) {
+				alert("Por favor, agrega una foto de la mascota.");
+				return;
+			}
+
+			const petNameInput = section.querySelector(
+				"#pet-name"
+			) as HTMLInputElement;
+
+			const petReportData = {
+				name: petNameInput.value,
+				lat: this.lat,
+				lng: this.lng,
+				imgUrl: preview.src, // Enviamos la imagen en base64
+				lost: true, // Por defecto es true porque estamos reportando pérdida
+			};
+
+			return await this.sendReportData(petReportData)
+		});
+
+		const style = document.createElement("style");
+		style.innerHTML = `
             @import url('https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css');
 
             section{
@@ -230,6 +295,10 @@ class CreateReportPage extends HTMLElement {
                 font-family: "Poppins", sans-serif;
             }
 
+            form button:hover{
+                cursor: pointer;
+            }
+
             .picture-preview{
                 width: 100%;
             }
@@ -264,12 +333,12 @@ class CreateReportPage extends HTMLElement {
             .hidden{
                 display: none;
             }
-        `
+        `;
 
-        this.shadow.appendChild(section);
-        this.shadow.appendChild(style);
-        this.initMap();
-    }
+		this.shadow.appendChild(section);
+		this.shadow.appendChild(style);
+		this.initMap();
+	}
 }
 
-customElements.define('create-report', CreateReportPage);
+customElements.define("create-report", CreateReportPage);
