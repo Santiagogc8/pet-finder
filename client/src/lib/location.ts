@@ -21,16 +21,26 @@ async function getLocationFromCoords(lng: number, lat: number) {
 	);
 
 	const data = await response.json();
-	const tiposAceptados = ['neighborhood', 'locality', 'place'];
+	
+	const neighborhood = data.features.find((f: any) => f.place_type.includes('neighborhood'));
+    const locality = data.features.find((f: any) => f.place_type.includes('locality') || f.place_type.includes('place'));
+    const region = data.features.find((f: any) => f.place_type.includes('region'));
+    const country = data.features.find((f: any) => f.place_type.includes('country'));
 
-	// 2. Buscamos en el array de features
-	const miLugar = data.features.find((feature: any) => {
-		// ¿El place_type de este feature está incluido en mi lista de aceptados?
-		const filter = feature.place_type.some((type: any) => tiposAceptados.includes(type));
-		return filter; 
-	});
-
-	return miLugar ? miLugar.place_name : "Ubicación desconocida";
+    // Construimos la cadena según lo que encontramos
+    if (neighborhood && locality) {
+        // Opción A: Barrio, Ciudad
+        return `${neighborhood.text}, ${locality.text}`;
+    } else if (locality && region) {
+        // Opción B: Ciudad, Estado/Provincia (si no hay barrio)
+        return `${locality.text}, ${region.text}`;
+    } else if (locality && country) {
+         // Opción C: Ciudad, País
+        return `${locality.text}, ${country.text}`;
+    } else {
+        // Fallback: Lo mejor que tengamos o desconocido
+        return locality ? locality.text : "Ubicación desconocida";
+    }
 }
 
 async function getLocationFromQuery(query: string) {
