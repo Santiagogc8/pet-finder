@@ -185,7 +185,7 @@ app.get("/my-pets", authMiddleware, async (req, res) => {
 	try{
 		const pets = await getUserPets(payload.id);
 
-		return res.json({pets})
+		return res.json(pets)
 	}	catch(error){
 		return res.status(500).json({ error: error.message });
 	}

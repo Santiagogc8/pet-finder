@@ -165,7 +165,7 @@ class PetsAroundPage extends HTMLElement {
         }
 
         if(error){
-            section.querySelector('h3')!.innerText = `${error}`
+            section.querySelector('h3')!.innerText = `${error}`;
         } else if (pets.length === 0) {
             // Caso vacío
             section.querySelector('h3')!.innerText = `No hay mascotas reportadas cerca de ti 🤷‍♂️`

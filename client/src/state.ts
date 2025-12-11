@@ -9,8 +9,13 @@ const state = {
             isLoading: null,
             error: null
         },
+		reportsFetching: {
+			reports: [] as any,
+			isLoading: null,
+			error: null
+		},
 		token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY0OTA3ODQ2fQ.FBd8kLDp8THfPLScGHPpliNqS8TYlhQmSFBW2wbOGRs" as any,
-		coords: null
+		coords: null as any
 	},
 	listeners: [] as any[], // Guarda el array de callbacks (listeners)
 	getState() {
