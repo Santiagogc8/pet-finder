@@ -73,11 +73,7 @@ async function createPet(userId: number, petData: PetData) {
 async function getPetById(petId: number) {
 	try { // Intentamos
         // Obtener una mascota con findByPk y el id recibido
-		const petFind = await Pet.findByPk(petId, {
-
-            // Y le pedimos que incluya el atributo email de la propiedad User a la que pertenece este modelo
-			include: [{ model: User, attributes: ["email"] }],
-		});
+		const petFind = await Pet.findByPk(petId);
 
 		if (!petFind) throw new Error("pet not found"); // Si petFind no retorna nada, tiramos error
 

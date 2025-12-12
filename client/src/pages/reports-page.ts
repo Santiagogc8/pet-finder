@@ -130,7 +130,7 @@ class ReportPage extends HTMLElement {
                     <div class="report-card__info">
                         <h3>${report.name}</h3>
                         <p>${report.textLocation}</p>
-                        <button id="edit-btn">Editar </button>
+                        <a href="/edit-report?id=${report.id}" id="edit-btn">Editar </a>
                     </div>
                 `
 

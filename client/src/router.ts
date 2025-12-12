@@ -13,6 +13,7 @@ import './pages/update-profile';
 import './pages/update-password';
 import './pages/reports-page';
 import './pages/create-report-page';
+import './pages/edit-report-page';
 
 // Components
 import './components/nav'
@@ -33,6 +34,7 @@ export class MyElement extends LitElement {
         { path: '/update-password', render: () => html`<update-password></update-password>`},
         { path: '/my-reports', render: () => html`<report-page></report-page>`},
         { path: '/new-report', render: () => html`<create-report></create-report>`},
+        { path: '/edit-report', render: () => html`<edit-report></edit-report>`},
     ]);
 
     // Y renderiza

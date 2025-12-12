@@ -8,7 +8,7 @@ import { sequelize } from "../db";
 // Controllers
 import { registerUser, getUserById, verifyUserExist, updateUserData } from "../controllers/user-controller";
 import { authLogIn, verifyToken, updatePassword } from "../controllers/auth-controller";
-import { createPet, searchPetsAround, getUserPets } from "../controllers/pet-controller";
+import { createPet, searchPetsAround, getUserPets, getPetById } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
 
 // Middlewares
@@ -189,7 +189,25 @@ app.get("/my-pets", authMiddleware, async (req, res) => {
 	}	catch(error){
 		return res.status(500).json({ error: error.message });
 	}
-})
+});
+
+app.get("/pets/:id", authMiddleware, async (req, res) => {
+	const { id } = req.params;
+
+	if(!id) return res.status(400).json({error: "id was expected"});
+
+	try{
+		const pet = await getPetById(parseInt(id));
+
+		if ((pet as any).error) {
+            return res.status(404).json(pet);
+        }
+
+        return res.json(pet);
+	} catch(error){
+		return res.status(500).json({ error: error.message });
+	}
+});
 
 // Creacion de report
 // Creamos un endpoint que nos ayudara a crear un nuevo reporte y le pasamos un middleware para que valide si se le paso un auth o no
