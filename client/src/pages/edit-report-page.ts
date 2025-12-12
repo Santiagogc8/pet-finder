@@ -48,6 +48,8 @@ class EditReportPage extends HTMLElement {
 
             this.petName = data.name;
             this.location = await getLocationFromCoords(data.lng, data.lat);
+            this.lng = data.lng;
+            this.lat = data.lat;
             this.petImgUrl = data.imageUrl;
 
             this.render();
@@ -60,8 +62,8 @@ class EditReportPage extends HTMLElement {
 	}
 
     initMap() {
-		const currentLng = this.lng ? this.lng : -74.09;
-		const currentLat = this.lat ? this.lat : 4.65;
+		const initialLng = this.lng || -74.09;
+		const initialLat = this.lat || 4.65;
 
 		// Buscamos el contenedor del mapa en nuestro Shadow DOM
 		const mapContainer = this.shadow.getElementById("map");
@@ -73,7 +75,7 @@ class EditReportPage extends HTMLElement {
 		const map = new mapboxgl.Map({
 			container: mapContainer as HTMLElement, // Referencia al div
 			style: "mapbox://styles/mapbox/streets-v11",
-			center: [currentLng, currentLat], // Coordenadas iniciales (ej. Bogotá)
+			center: [initialLng, initialLat], // Coordenadas iniciales (ej. Bogotá)
 			zoom: 13,
 		});
 
@@ -82,6 +84,12 @@ class EditReportPage extends HTMLElement {
 
 		// Variable para el marcador actual
 		let currentMarker: mapboxgl.Marker | null = null;
+
+        if (this.lng && this.lat) {
+            currentMarker = new mapboxgl.Marker()
+                .setLngLat([initialLng, initialLat])
+                .addTo(map);
+        }
 
 		// Escuchamos el evento 'click' en el mapa
 		map.on("click", async (e) => {
@@ -181,7 +189,7 @@ class EditReportPage extends HTMLElement {
                 flex-direction: column;
                 justify-content: space-between;
                 width: 100%;
-                margin: 90px 0;
+                margin: 20px 0 80px 0;
                 max-width: 600px;
             }
 

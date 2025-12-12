@@ -1,6 +1,5 @@
 // Hacemos las importaciones de la clase Pet y uploadImage de cloudinary
 import { Pet } from "../db/pet";
-import { User } from "../db/user";
 import { uploadImage } from "../lib/cloudinary";
 import { client, indexName } from "../lib/algolia";
 
@@ -105,6 +104,38 @@ async function getUserPets(userId: number) {
 	} catch(error){
 		// Si hay un error
 		return { error: `${error.message}` }; // Lo retornamos
+	}
+}
+
+async function updatePet(petId: number, userId: number, newData: any) {
+	const allowedFields = ['name', 'lat', 'lng', 'imgUrl', 'lost']; // Qué permitimos
+    const updateData: any = {}; // Donde guardaremos los datos que si enviaremos
+
+    // Recorremos la lista blanca (allowedFields)
+    allowedFields.forEach(field => {
+        // Si el dato viene en newData, lo copiamos
+        if (newData[field] !== undefined) {
+            updateData[field] = newData[field];
+        }
+    });
+
+	try{
+		const [count] = await Pet.update(updateData, {
+			where: {
+				id: petId,
+				UserId: userId
+			}
+		});
+
+		if (count === 0) {
+            throw new Error("pet not found or you are not the owner");
+        }
+
+		// client.partialUpdateObject()
+
+		return { message: "pet updated successfully" };
+	} catch(error){
+
 	}
 }
 
