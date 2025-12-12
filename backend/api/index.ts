@@ -8,7 +8,7 @@ import { sequelize } from "../db";
 // Controllers
 import { registerUser, getUserById, verifyUserExist, updateUserData } from "../controllers/user-controller";
 import { authLogIn, verifyToken, updatePassword } from "../controllers/auth-controller";
-import { createPet, searchPetsAround, getUserPets, getPetById } from "../controllers/pet-controller";
+import { createPet, searchPetsAround, getUserPets, getPetById, updatePet, deletePet } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
 
 // Middlewares
@@ -204,6 +204,47 @@ app.get("/pets/:id", authMiddleware, async (req, res) => {
         }
 
         return res.json(pet);
+	} catch(error){
+		return res.status(500).json({ error: error.message });
+	}
+});
+
+app.patch("/pets/:id", authMiddleware, async (req, res) => {
+	const { id } = req.params;
+	const payload = req.payload;
+	const body = req.body;
+
+	// Si no recibimos token, tiramos error
+	if (!payload) return res.status(401).json({ error: "unauthorized" });
+	
+	if(!id) return res.status(400).json({error: "id was expected"});
+
+	try{
+		const response = await updatePet(parseInt(id), parseInt(payload.id), body);
+
+		if(response.error) return res.status(400).json({error: response.error})
+
+		return res.json({message: response.message})
+	} catch(error){
+		return res.status(500).json({ error: error.message });
+	}
+});
+
+app.delete("/pets/:id", authMiddleware, async (req, res) => {
+	const { id } = req.params;
+	const payload = req.payload;
+
+	// Si no recibimos token, tiramos error
+	if (!payload) return res.status(401).json({ error: "unauthorized" });
+	
+	if(!id) return res.status(400).json({error: "id was expected"});
+
+	try{
+		const response = await deletePet(parseInt(id), parseInt(payload.id));
+
+		if(response.error) return res.status(400).json({error: response.error})
+
+		return res.json({message: response.message})
 	} catch(error){
 		return res.status(500).json({ error: error.message });
 	}
