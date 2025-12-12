@@ -131,12 +131,46 @@ async function updatePet(petId: number, userId: number, newData: any) {
             throw new Error("pet not found or you are not the owner");
         }
 
-		// client.partialUpdateObject()
+		let algoliaUpdateData = { ...updateData }; // Copia inicial
 
-		return { message: "pet updated successfully" };
+        // Si hay coordenadas, transformamos la estructura
+        if (updateData.lat && updateData.lng) {
+            const { lat, lng, ...rest } = updateData;
+            algoliaUpdateData = rest; // El objeto sin lat/lng sueltos
+            algoliaUpdateData._geoloc = { lat, lng }; // Agregamos la estructura correcta
+        }
+
+		const {taskID} = await client.partialUpdateObject({
+			indexName,
+			objectID: petId.toString(),
+			attributesToUpdate: algoliaUpdateData
+		})
+
+		return { message: "pet updated successfully", taskID };
 	} catch(error){
-
+		return { error: error.message };
 	}
 }
 
-export { createPet, getPetById, searchPetsAround, getUserPets };
+async function deletePet(petId: number, userId: number) {
+	try{
+		const petDeleted = await Pet.destroy({
+			where: {
+				id: petId,
+				UserId: userId
+			}
+		});
+
+		if(petDeleted === 0){
+			throw new Error("pet not found or you are not the owner")
+		}
+
+		await client.deleteObject({indexName, objectID: petId.toString()})
+
+		return { message: "pet deleted successfully" };
+	} catch(error){
+		return { error: error.message };
+	}
+}
+
+export { createPet, getPetById, searchPetsAround, getUserPets, updatePet, deletePet };
