@@ -1,4 +1,4 @@
-import { state } from "../state";
+import { state, API_BASE_URL } from "../state";
 import { getLocationFromQuery, getLocationFromCoords } from "../lib/location";
 
 class UpdateProfile extends HTMLElement {
@@ -42,7 +42,7 @@ class UpdateProfile extends HTMLElement {
     async sendNewProfileData(data: any, token: string){
         const { name, lng, lat } = data;
 
-        const response = await fetch("http://localhost:3000/user", {
+        const response = await fetch(`${API_BASE_URL}/user`, {
             method: 'PATCH',
             headers: {
                 "Content-Type": "application/json",

@@ -1,4 +1,4 @@
-import { state } from "../state";
+import { state, API_BASE_URL } from "../state";
 
 class MePage extends HTMLElement {
     shadow: ShadowRoot;
@@ -23,7 +23,7 @@ class MePage extends HTMLElement {
     }
 
     async getUserInfo(token: string){
-        const response = await fetch('http://localhost:3000/me', {
+        const response = await fetch(`${API_BASE_URL}/me`, {
             method: 'GET',
             headers: {
 				"Content-Type": "application/json",

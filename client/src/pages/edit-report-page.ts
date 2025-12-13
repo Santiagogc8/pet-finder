@@ -1,4 +1,4 @@
-import { state } from "../state";
+import { state, API_BASE_URL } from "../state";
 import { getLocationFromCoords } from "../lib/location";
 import mapboxgl from "mapbox-gl";
 
@@ -8,7 +8,8 @@ class EditReportPage extends HTMLElement {
     lng: number = 0;
     lat: number = 0;
     petImgUrl: string = "https://res.cloudinary.com/drvtfag9j/image/upload/v1765399440/image_7_zeo02z.png";
-    location: string = "Ubicacion desconocida"
+    location: string = "Ubicacion desconocida";
+    petId: number = 0;
 
 	constructor() {
 		super();
@@ -21,10 +22,10 @@ class EditReportPage extends HTMLElement {
 		if (currentState.token) {
 			const queryString = window.location.search;
 			const urlParams = new URLSearchParams(queryString);
-			const id = urlParams.get("id") as string;
+			this.petId = parseInt(urlParams.get("id") as string);
 
-			if(id){
-                await this.getPetInfo(parseInt(id), currentState.token);
+			if(this.petId){
+                await this.getPetInfo(this.petId, currentState.token);
             } else {
                 history.pushState({}, "", "/my-reports");
 			    window.dispatchEvent(new PopStateEvent("popstate")); // Le decimos a la ventana que la ruta cambio
@@ -37,7 +38,7 @@ class EditReportPage extends HTMLElement {
 
 	async getPetInfo(id: number, token: string) {
 		try{
-            const response = await fetch(`http://localhost:3000/pets/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/pets/${id}`, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `bearer ${token}`,
@@ -63,7 +64,7 @@ class EditReportPage extends HTMLElement {
 
     async sendNewDataReport(petId: number, token: string, newData: any){
         try{
-            const response = await fetch(`http://localhost:3000/pets/${petId}`, {
+            const response = await fetch(`${API_BASE_URL}/pets/${petId}`, {
                 method: 'PATCH',
                 headers: {
                     "Content-Type": "application/json",
@@ -74,16 +75,21 @@ class EditReportPage extends HTMLElement {
 
             const data = await response.json();
 
-            return data.message;
+            if(response.ok) { // Verificamos si el status es 200-299
+                return true; 
+            } else {
+                console.error(data.error);
+                return false; 
+            }
         } catch(error){
             console.error(error);
-            return alert(`Ocurrio un error inesperado. Revisa la consola para mas informacion.`);
+            return false;
         }
     }
 
     async deletePet(petId: number, token: string){
         try{
-            const response = await fetch(`http://localhost:3000/pets/${petId}`, {
+            const response = await fetch(`${API_BASE_URL}/pets/${petId}`, {
                 method: 'DELETE',
                 headers: {
                     "Content-Type": "application/json",
@@ -93,10 +99,15 @@ class EditReportPage extends HTMLElement {
 
             const data = await response.json();
 
-            return data.message;
+            if(response.ok) { // Verificamos si el status es 200-299
+                return true; 
+            } else {
+                console.error(data.error);
+                return false; 
+            }
         } catch(error){
             console.error(error);
-            return alert(`Ocurrio un error inesperado. Revisa la consola para mas informacion.`);
+            return false;
         }
     }
 
@@ -107,8 +118,7 @@ class EditReportPage extends HTMLElement {
 		// Buscamos el contenedor del mapa en nuestro Shadow DOM
 		const mapContainer = this.shadow.getElementById("map");
 
-		mapboxgl.accessToken =
-			"pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ";
+		mapboxgl.accessToken = process.env.MAPBOX_TOKEN
 
 		// Inicializamos el mapa
 		const map = new mapboxgl.Map({
@@ -155,6 +165,8 @@ class EditReportPage extends HTMLElement {
 	}
 
 	render() {
+        const currentState = state.getState()
+
 		const section = document.createElement("section");
 		section.innerHTML = `
             <h4>Editar reporte de mascota</h4>
@@ -197,8 +209,8 @@ class EditReportPage extends HTMLElement {
                         required>
                 </div>
                 <button type="submit" id="form__submit">Guardar</button>
-                <button id="find__btn">Reportar como encontrado</button>
-                <button id="delete__report">Eliminar reporte</button>
+                <button id="find__btn" type="button">Reportar como encontrado</button>
+                <button id="delete__report" type="button">Eliminar reporte</button>
             </form>
         `;
 
@@ -228,15 +240,65 @@ class EditReportPage extends HTMLElement {
 		});
 
         const form = section.querySelector('#pet-report');
-        const submitBtn = section.querySelector('#form__submit');
         const findBtn = section.querySelector('#find__btn');
         const deleteBtn = section.querySelector('#delete__report');
 
         form?.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+			const petNameInput = section.querySelector("#pet-name") as HTMLInputElement;
+            
+            // Creamos el objeto base solo con lo que SIEMPRE cambia o es obligatorio
+            const petReportData: any = {
+                name: petNameInput.value,
+                lat: this.lat,
+                lng: this.lng,
+            };
 
-        })
+            // Solo agregamos la imagen si el usuario seleccionó un archivo nuevo
+            if (fileInput.files && fileInput.files.length > 0) {
+                petReportData.imgUrl = preview.src; 
+            }
+
+            const success = await this.sendNewDataReport(this.petId, currentState.token, petReportData);
+            
+            if (success) {
+                alert("¡Datos actualizados correctamente!");
+                // Redirigimos
+                history.pushState({}, "", "/my-reports");
+                window.dispatchEvent(new PopStateEvent("popstate"));
+            } else {
+                alert("Error al actualizar. Verifica los datos.");
+            }
+        });
+
+        findBtn?.addEventListener("click", async (e) => {
+            const success = await this.sendNewDataReport(this.petId, currentState.token, { lost: false });
+
+            if (success) {
+                alert("¡Qué buena noticia! Mascota marcada como encontrada.");
+                history.pushState({}, "", "/my-reports");
+                window.dispatchEvent(new PopStateEvent("popstate"));
+            } else {
+                alert("Error al actualizar el estado.");
+            }
+        });
+
+        deleteBtn?.addEventListener("click", async (e) => {
+            const userConfirm = confirm("¿Estás seguro de eliminar el reporte? Esta acción no se puede revertir");
+
+            if(userConfirm){
+                const success = await this.deletePet(this.petId, currentState.token);
+
+                if (success) {
+                    alert("El reporte se ha eliminado correctamente");
+                    history.pushState({}, "", "/my-reports");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                } else {
+                    alert("Ha ocurrido un error al eliminar.");
+                }
+            }
+        });
 
 		const style = document.createElement("style");
 		style.innerHTML = `

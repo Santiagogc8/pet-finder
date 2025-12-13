@@ -1,4 +1,4 @@
-import { state } from "../state";
+import { state, API_BASE_URL } from "../state";
 import { getPositionFromDirection } from "../lib/location";
 import { getPosition } from "../lib/location";
 
@@ -15,7 +15,7 @@ class RegisterPage extends HTMLElement {
 	}
 
 	async signUpUser(name: string, email: string, password: string, lat: number, lng: number) {
-		const res = await fetch("http://localhost:3000/" + "auth/signup", {
+		const res = await fetch(`${API_BASE_URL}/report/auth/signup`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

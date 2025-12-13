@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../state";
+
 // Pagina de LogIn
 class LogInPage extends HTMLElement {
 	shadow: ShadowRoot;
@@ -11,7 +13,7 @@ class LogInPage extends HTMLElement {
 	}
 
 	async logInUser(email: string, password: string) {
-		const res = await fetch("http://localhost:3000/" + "auth/login", {
+		const res = await fetch(`${API_BASE_URL}/auth/login`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

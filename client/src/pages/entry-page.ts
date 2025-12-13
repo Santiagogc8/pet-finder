@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../state";
+
 // Componente de verificacion de usuario (existe en la db o no)
 class EntryPage extends HTMLElement{
     shadow: ShadowRoot;
@@ -13,7 +15,7 @@ class EntryPage extends HTMLElement{
     // Creamos una funcion que recibe un email
     async validateUser(email: string){
         // Esperamos la respuesta del fetch y le pasamos el email
-        const res = await fetch('http://localhost:3000/'+'auth/check-email', {
+        const res = await fetch(`${API_BASE_URL}/auth/check-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

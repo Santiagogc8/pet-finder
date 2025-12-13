@@ -1,3 +1,5 @@
+const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3000";
+
 // Creamos nuestro estado
 const state = {
 	data: {
@@ -49,4 +51,4 @@ const state = {
 	}
 };
 
-export { state };
+export { state, API_BASE_URL };

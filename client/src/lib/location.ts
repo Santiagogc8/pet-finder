@@ -1,9 +1,11 @@
+const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_TOKEN;
+
 async function getPositionFromDirection(city: string, address: string) {
 	const fullAddress = city + " " + address;
 	const addressEncoded = encodeURIComponent(fullAddress);
 
 	const response = await fetch(
-		`https://api.mapbox.com/geocoding/v5/mapbox.places/${addressEncoded}.json?access_token=pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ`
+		`https://api.mapbox.com/geocoding/v5/mapbox.places/${addressEncoded}.json?access_token=${MAPBOX_ACCESS_TOKEN}`
 	);
 
 	const data = await response.json();
@@ -17,7 +19,7 @@ async function getPositionFromDirection(city: string, address: string) {
 
 async function getLocationFromCoords(lng: number, lat: number) {
 	const response = await fetch(
-		`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ`
+		`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_ACCESS_TOKEN}`
 	);
 
 	const data = await response.json();
@@ -45,7 +47,7 @@ async function getLocationFromCoords(lng: number, lat: number) {
 
 async function getLocationFromQuery(query: string) {
 	const response = await fetch(
-		`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?access_token=pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ&limit=10`
+		`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?access_token=${MAPBOX_ACCESS_TOKEN}&limit=10`
 	);
 
 	const data = await response.json();

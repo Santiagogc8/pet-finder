@@ -1,4 +1,4 @@
-import { state } from "../state";
+import { state, API_BASE_URL } from "../state";
 import { getLocationFromCoords } from "../lib/location";
 import mapboxgl from "mapbox-gl";
 
@@ -35,9 +35,7 @@ class CreateReportPage extends HTMLElement {
 		// Buscamos el contenedor del mapa en nuestro Shadow DOM
 		const mapContainer = this.shadow.getElementById("map");
 
-		mapboxgl.accessToken =
-			"pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ";
-
+		mapboxgl.accessToken = process.env.MAPBOX_TOKEN
 		// Inicializamos el mapa
 		const map = new mapboxgl.Map({
 			container: mapContainer as HTMLElement, // Referencia al div
@@ -81,7 +79,7 @@ class CreateReportPage extends HTMLElement {
 		const { name, lat, lng, imgUrl, lost } = data;
 
 		try {
-			const res = await fetch("http://localhost:3000/pets", {
+			const res = await fetch(`${API_BASE_URL}/pets`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

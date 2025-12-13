@@ -1,4 +1,4 @@
-import { state } from "../state";
+import { state, API_BASE_URL } from "../state";
 import { getLocationFromCoords } from "../lib/location";
 
 class ReportPage extends HTMLElement {
@@ -35,7 +35,7 @@ class ReportPage extends HTMLElement {
         });
 
         try{
-            const response = await fetch('http://localhost:3000/my-pets', {
+            const response = await fetch(`${API_BASE_URL}/my-pets`, {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `bearer ${token}`

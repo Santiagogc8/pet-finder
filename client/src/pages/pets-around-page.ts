@@ -1,4 +1,4 @@
-import { state } from "../state";
+import { state, API_BASE_URL } from "../state";
 import { getLocationFromCoords } from "../lib/location";
 
 class PetsAroundPage extends HTMLElement {
@@ -37,7 +37,7 @@ class PetsAroundPage extends HTMLElement {
         });
         
         try{
-            const response = await fetch(`http://localhost:3000/pets/around?lat=${lat}&lng=${lng}`);
+            const response = await fetch(`${API_BASE_URL}/pets/around?lat=${lat}&lng=${lng}`);
             const data = await response.json();
 
             const petsWithLocation = await Promise.all(
@@ -81,7 +81,7 @@ class PetsAroundPage extends HTMLElement {
     }
 
     async sendReport(name: string, phone: string, message: string, petId: number){
-        const response = await fetch('http://localhost:3000/report', {
+        const response = await fetch(`${API_BASE_URL}/report`, {
             method: "POST",
 			headers: {
 				"Content-Type": "application/json",
