@@ -17,7 +17,7 @@ class UpdateProfile extends HTMLElement {
         const currentState = state.getState();
 
         if(currentState.token){
-            if(currentState.me.name && currentState.me.lng & currentState.me.lat){
+            if(currentState.me.name && currentState.me.lng && currentState.me.lat){
                 this.location = await this.getLocationByCoords(currentState.me.lng, currentState.me.lat)
                 this.username = currentState.me.name;
                 this.render();
@@ -40,22 +40,28 @@ class UpdateProfile extends HTMLElement {
     }
 
     async sendNewProfileData(data: any, token: string){
-        const { name, lng, lat } = data;
+        try {
+            const response = await fetch(`${API_BASE_URL}/me`, {
+                method: 'PATCH',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
 
-        const response = await fetch(`${API_BASE_URL}/user`, {
-            method: 'PATCH',
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `bearer ${token}`
-            },
-            body: JSON.stringify({
-                name,
-                lng,
-                lat
-            })
-        });
+            const resData = await response.json();
 
-        const resData = await response.json();
+            if(response.ok){
+                return true;
+            } else {
+                console.error(resData.error);
+                return false;
+            }
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
     }
 
     async getLocationByCoords(lng: number, lat: number){
@@ -142,6 +148,24 @@ class UpdateProfile extends HTMLElement {
 
         submitBtn?.addEventListener("click", async (e) => {
             e.preventDefault();
+            
+            const currentState = state.getState();
+            const nameInput = section.querySelector("#name") as HTMLInputElement;
+
+            const newData = {
+                name: nameInput.value,
+                lat: this.lat,
+                lng: this.lng
+            };
+
+            const success = await this.sendNewProfileData(newData, currentState.token);
+
+            if(success){
+                alert("Datos guardados correctamente ✅");
+                window.location.reload();
+            } else {
+                alert("Error al guardar los datos ❌");
+            }
         })
 
         const style = document.createElement('style');

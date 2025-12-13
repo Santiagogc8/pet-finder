@@ -102,7 +102,7 @@ app.get("/me", authMiddleware, async (req, res) => {
 	}
 });
 
-app.patch(`/user`, authMiddleware, async (req, res) => {
+app.patch(`/me`, authMiddleware, async (req, res) => {
 	const payload = req.payload; // Guardamos el token en una variable
 	const body = req.body;
 	
@@ -125,7 +125,7 @@ app.patch(`/user`, authMiddleware, async (req, res) => {
 	}
 });
 
-app.patch('/user/auth', authMiddleware, async (req, res) => {
+app.patch('/me/auth', authMiddleware, async (req, res) => {
 	const payload = req.payload;
 	const { password } = req.body;
 
