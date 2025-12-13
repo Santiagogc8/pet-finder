@@ -61,6 +61,45 @@ class EditReportPage extends HTMLElement {
         }
 	}
 
+    async sendNewDataReport(petId: number, token: string, newData: any){
+        try{
+            const response = await fetch(`http://localhost:3000/pets/${petId}`, {
+                method: 'PATCH',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `bearer ${token}`
+                }, 
+                body: JSON.stringify(newData)
+            })
+
+            const data = await response.json();
+
+            return data.message;
+        } catch(error){
+            console.error(error);
+            return alert(`Ocurrio un error inesperado. Revisa la consola para mas informacion.`);
+        }
+    }
+
+    async deletePet(petId: number, token: string){
+        try{
+            const response = await fetch(`http://localhost:3000/pets/${petId}`, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            return data.message;
+        } catch(error){
+            console.error(error);
+            return alert(`Ocurrio un error inesperado. Revisa la consola para mas informacion.`);
+        }
+    }
+
     initMap() {
 		const initialLng = this.lng || -74.09;
 		const initialLat = this.lat || 4.65;
@@ -162,6 +201,42 @@ class EditReportPage extends HTMLElement {
                 <button id="delete__report">Eliminar reporte</button>
             </form>
         `;
+
+        const addPetPictureBtn = section.querySelector("#add-pet-picture");
+		const fileInput = section.querySelector("#pet-image") as HTMLInputElement;
+		const preview = section.querySelector(".picture-preview") as HTMLImageElement;
+
+		// Al hacer clic en el cuadro gris, activamos el input oculto
+		addPetPictureBtn?.addEventListener("click", () => {
+			fileInput.click();
+		});
+
+		// Cuando el usuario elige un archivo...
+		fileInput.addEventListener("change", () => {
+			const file = fileInput.files?.[0];
+			if (file) {
+				const reader = new FileReader();
+
+				reader.onload = (e) => {
+					const result = e.target?.result as string;
+					// Mostramos la preview y ocultamos el texto
+					preview.src = result;
+				};
+
+				reader.readAsDataURL(file);
+			}
+		});
+
+        const form = section.querySelector('#pet-report');
+        const submitBtn = section.querySelector('#form__submit');
+        const findBtn = section.querySelector('#find__btn');
+        const deleteBtn = section.querySelector('#delete__report');
+
+        form?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+
+        })
 
 		const style = document.createElement("style");
 		style.innerHTML = `
