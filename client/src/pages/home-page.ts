@@ -69,6 +69,7 @@ class HomePage extends HTMLElement{
                 width: 90%;
                 max-width: 270px;
                 box-sizing: border-box;
+                margin-bottom: 50px;
             }
 
             .home__info h3{

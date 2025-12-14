@@ -156,6 +156,7 @@ class PetsAroundPage extends HTMLElement {
 
                 section h3{
                     font-size: 24px;
+                    text-align: center;
                 }
             `
 
@@ -174,8 +175,10 @@ class PetsAroundPage extends HTMLElement {
                 const card = document.createElement('div');
                 card.classList.add('pet-card');
 
+                if(!pet.lost) return;
+
                 card.innerHTML = `
-                    <img src="https://voca-land.sgp1.cdn.digitaloceanspaces.com/43844/1654148724932/a782407639e0a9fa0e1509391a3feb39414681de6795983c8e0d7c13670aa6f6.jpg">
+                    <img src="${pet.imgUrl}">
                     <div class="pet-card__info">
                         <h3>${pet.name}</h3>
                         <p>${pet.textLocation}</p>
@@ -250,6 +253,7 @@ class PetsAroundPage extends HTMLElement {
 
             section h3{
                 font-size: 24px;
+                text-align: center;
             }
 
             .pets-card__container{
@@ -259,6 +263,7 @@ class PetsAroundPage extends HTMLElement {
                 justify-content: center;
                 gap: 2rem;
                 flex-wrap: wrap;
+                margin-bottom: 50px;
             }
 
             .pet-card{

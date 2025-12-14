@@ -45,7 +45,7 @@ async function createReport(data: ReportData) {
 
             // Luego usamos resend para enviar un correo al usuario que es dueño de la mascota
             resend.emails.send({
-                from: 'onboarding@resend.dev', // Enviamos el correo desde un dominio x
+                from: 'PetFinder App <onboarding@resend.dev>', // Enviamos el correo desde un dominio x
                 to: petFind.User.email, // Al email recibido de los atributos extraidos de petFind.User.email
                 subject: `Hay nueva informacion sobre ${petFind.name || 'tu mascota'}`, // Le ponemos el asunto
                 html: `

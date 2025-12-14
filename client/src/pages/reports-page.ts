@@ -126,7 +126,7 @@ class ReportPage extends HTMLElement {
                 card.classList.add('report-card');
 
                 card.innerHTML = `
-                    <img src="https://voca-land.sgp1.cdn.digitaloceanspaces.com/43844/1654148724932/a782407639e0a9fa0e1509391a3feb39414681de6795983c8e0d7c13670aa6f6.jpg">
+                    <img src="${report.imageUrl}">
                     <div class="report-card__info">
                         <h3>${report.name}</h3>
                         <p>${report.textLocation}</p>

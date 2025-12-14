@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../state";
+import { API_BASE_URL, state } from "../state";
 
 // Pagina de LogIn
 class LogInPage extends HTMLElement {
@@ -67,8 +67,9 @@ class LogInPage extends HTMLElement {
             if(token.error){
                 form.querySelector('.login__message')?.classList.remove('hidden')
             } else{
-                console.log('Hola, bienvenido')
-                console.log(token)
+                state.setState({token});
+                history.pushState({}, '', '/pets-around');
+                window.dispatchEvent(new PopStateEvent('popstate'));
             }
         })
 

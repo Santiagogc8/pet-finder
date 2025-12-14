@@ -111,7 +111,7 @@ async function requestPasswordReset(email: string) {
 	}, {where: {email}});
 
 	resend.emails.send({
-		from: 'onboarding@resend.dev',
+		from: 'PetFinder App <onboarding@resend.dev>',
 		to: email,
 		subject: "Tu enlace para recuperar la contraseña de Pet Finder App",
 		html: `

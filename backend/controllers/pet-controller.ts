@@ -2,6 +2,7 @@
 import { Pet } from "../db/pet";
 import { uploadImage } from "../lib/cloudinary";
 import { client, indexName } from "../lib/algolia";
+import { User } from "../db/user";
 
 interface PetData {
 	name: string;
@@ -51,7 +52,8 @@ async function createPet(userId: number, petData: PetData) {
                 "_geoloc": { // Y la geolocalizacion
                     "lat": petData.lat,
                     "lng": petData.lng
-                }
+                },
+				lost: petData.lost
             };
 
             // Agregamos el record al indice con saveObject
@@ -72,7 +74,12 @@ async function createPet(userId: number, petData: PetData) {
 async function getPetById(petId: number) {
 	try { // Intentamos
         // Obtener una mascota con findByPk y el id recibido
-		const petFind = await Pet.findByPk(petId);
+		const petFind = await Pet.findByPk(petId, {
+			include: {
+				model: User,
+				attributes: ['email']
+			}
+		});
 
 		if (!petFind) throw new Error("pet not found"); // Si petFind no retorna nada, tiramos error
 

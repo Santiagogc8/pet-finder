@@ -7,18 +7,18 @@ import { sequelize } from "../db";
 
 // Controllers
 import { registerUser, getUserById, verifyUserExist, updateUserData } from "../controllers/user-controller";
-import { authLogIn, verifyToken, updatePassword, requestPasswordReset, resetPassword  } from "../controllers/auth-controller";
+import { authLogIn, updatePassword, requestPasswordReset, resetPassword  } from "../controllers/auth-controller";
 import { createPet, searchPetsAround, getUserPets, getPetById, updatePet, deletePet } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
 
 // Middlewares
-import { authMiddleware, validateUser } from "../middlewares/middlewares";
+import { authMiddleware } from "../middlewares/middlewares";
 
 const port = process.env.PORT; // Establecemos el puerto recuperado de las variables de entorno
 const app = express(); // Inicializamos express
 
 app.use(cors()); // Le decimos que la app usara el middleware de cors
-app.use(express.json()); // Y que usara el middleware de json de express para recibir peticiones
+app.use(express.json({ limit: '30mb' })); // Y que usara el middleware de json de express para recibir peticiones
 
 // sequelize.sync({force: true}).then(e => e)
 // sequelize.sync({alter: true}).then(e => e)
@@ -183,6 +183,26 @@ app.patch('/me/auth', authMiddleware, async (req, res) => {
 	}
 });
 
+// Obtener mascotas cerca de una ubicacion
+// Creamos un endpoint para poder encontrar mascotas cerca de una ubicacion
+app.get('/pets/around', async(req, res) => {
+	const { lat, lng } = req.query; // Extraemos el lat y lng de las querys
+
+	// Si no recibimos lat o lng, tiramos error
+	if(!lat || !lng) return res.status(400).json({ error: 'lat and lng was expected' });
+
+	try{ // Intentamos
+		// Hacer el searchPetsAround con lat y lng como floats
+		const petsArray = await searchPetsAround(parseFloat(lat as string), parseFloat(lng as string));
+
+		res.json({ pets: petsArray }) // Y responder con el array de mascotas encontradas
+	} catch(error) {
+		// Si hay error
+		// Tiramos error con el mesaje del error
+		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+	}
+});
+
 // Crear una mascota
 // Debemos verificar que el usuario si exista y luego crear la mascota con el id de este usuario
 app.post("/pets", authMiddleware, async (req, res) => {
@@ -294,26 +314,6 @@ app.post("/report", async (req, res) => {
 			return res.json(reportCreated); // Retornamos el reporte creado
 		}
 	} catch(error){
-		// Si hay error
-		// Tiramos error con el mesaje del error
-		res.status(500).json({ error: `Error ocurred: ${error.message}` });
-	}
-});
-
-// Obtener mascotas cerca de una ubicacion
-// Creamos un endpoint para poder encontrar mascotas cerca de una ubicacion
-app.get('/pets/around', async(req, res) => {
-	const { lat, lng } = req.query; // Extraemos el lat y lng de las querys
-
-	// Si no recibimos lat o lng, tiramos error
-	if(!lat || !lng) return res.status(400).json({ error: 'lat and lng was expected' });
-
-	try{ // Intentamos
-		// Hacer el searchPetsAround con lat y lng como floats
-		const petsArray = await searchPetsAround(parseFloat(lat as string), parseFloat(lng as string));
-
-		res.json({ pets: petsArray }) // Y responder con el array de mascotas encontradas
-	} catch(error) {
 		// Si hay error
 		// Tiramos error con el mesaje del error
 		res.status(500).json({ error: `Error ocurred: ${error.message}` });
