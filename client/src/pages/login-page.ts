@@ -45,7 +45,7 @@ class LogInPage extends HTMLElement {
                     <input type="password" id="password" required autocomplete="off">
                 </div>
                 <p class="login__message hidden">Contraseña incorrecta</p>
-                <a href="#">Olvidé mi contraseña</a>
+                <a href="/reset-password">Olvidé mi contraseña</a>
                 <button>Acceder</button>
             </form>
         `;

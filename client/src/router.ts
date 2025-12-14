@@ -14,6 +14,7 @@ import './pages/update-password';
 import './pages/reports-page';
 import './pages/create-report-page';
 import './pages/edit-report-page';
+import './pages/reset-password';
 
 // Components
 import './components/nav'
@@ -35,6 +36,7 @@ export class MyElement extends LitElement {
         { path: '/my-reports', render: () => html`<report-page></report-page>`},
         { path: '/new-report', render: () => html`<create-report></create-report>`},
         { path: '/edit-report', render: () => html`<edit-report></edit-report>`},
+        { path: '/reset-password', render: () => html`<reset-password></reset-password>`},
     ]);
 
     // Y renderiza
