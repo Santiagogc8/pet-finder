@@ -3,7 +3,13 @@ import { DataTypes, Model } from "sequelize";
 import { sequelize } from ".";
 
 // Exportamos la clase auth
-export class Auth extends Model {}
+export class Auth extends Model {
+    declare userId: number;
+    declare email: string;
+    declare password: string;
+    declare token: string | null; // Puede ser null
+    declare expirationDate: Date | null; // Puede ser null
+}
 
 // E inicializamos el modelo Auth
 Auth.init({
@@ -20,5 +26,7 @@ Auth.init({
     password: {
         type: DataTypes.STRING,
         allowNull: false
-    }
+    },
+    token: DataTypes.STRING,
+    expirationDate: DataTypes.DATE
 }, { sequelize, modelName: "Auth" });

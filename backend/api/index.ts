@@ -7,7 +7,7 @@ import { sequelize } from "../db";
 
 // Controllers
 import { registerUser, getUserById, verifyUserExist, updateUserData } from "../controllers/user-controller";
-import { authLogIn, verifyToken, updatePassword } from "../controllers/auth-controller";
+import { authLogIn, verifyToken, updatePassword, requestPasswordReset, resetPassword  } from "../controllers/auth-controller";
 import { createPet, searchPetsAround, getUserPets, getPetById, updatePet, deletePet } from "../controllers/pet-controller";
 import { createReport } from "../controllers/report-controller";
 
@@ -79,6 +79,35 @@ app.post("/auth/login", async (req, res) => {
 	} catch (error) {
 		// Si hay error
 		// Tiramos error con el mesaje del error
+		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+	}
+});
+
+app.post("/auth/reset", async (req, res) => {
+	const { email } = req.body;
+
+	try{
+		const count = await requestPasswordReset(email);
+
+		return res.json({ count });
+	} catch(error){
+		if(error.message === 'user not found') return res.status(404).json({error: 'user not found'});
+
+		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+	}
+});
+
+app.patch("/auth/reset", async (req, res) => {
+	const { newPassword } = req.body;
+	const { id } = req.query;
+
+	try{
+		const count = await resetPassword(id, newPassword);
+
+		return res.json({ count });
+	} catch(error){
+		if(error.message === 'unauthorized' || error.message === 'time expired') return res.status(401).json({error: 'unauthorized'});
+
 		res.status(500).json({ error: `Error ocurred: ${error.message}` });
 	}
 });

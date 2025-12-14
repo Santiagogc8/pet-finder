@@ -2,10 +2,13 @@ import { Auth } from "../db/models";
 // import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
+import { v4 as uuidv4 } from 'uuid';
 import { Transaction } from "sequelize";
+import { resend } from "../lib/resend";
 
 // Extraemos el secret del .env
 const SECRET = process.env.SECRET;
+const FRONTURL = process.env.FRONTEND_URL;
 
 // Creamos una funcion asincrona de bcrypt que es mas seguro que sha
 async function getBcryptHash(text: string) {
@@ -92,4 +95,59 @@ async function updatePassword(userId: number, newPassword: string) {
     return count;
 }
 
-export { authRegister, authLogIn, generateToken, verifyToken, updatePassword };
+async function requestPasswordReset(email: string) {
+	const findAuth = await Auth.findOne({
+		where: { email }
+	});
+
+	if(!findAuth) throw new Error('user not found');
+
+	const token = uuidv4();
+	const expirationDate = new Date(Date.now() + 30 * 60 * 1000);
+
+	const [count] = await Auth.update({
+		token,
+		expirationDate
+	}, {where: {email}});
+
+	resend.emails.send({
+		from: 'onboarding@resend.dev',
+		to: email,
+		subject: "Tu enlace para recuperar la contraseña de Pet Finder App",
+		html: `
+			<p>Este es tu enlace de recuperacion de contraseña</p>
+			<a href="${FRONTURL}/reset-password?id=${token}">Recupera tu contraseña</a>
+		`
+	});
+
+	return count;
+}
+
+async function resetPassword(token: string, newPassword: string) {
+	const findAuth = await Auth.findOne({
+		where: { token }
+	});
+
+	if(!findAuth) throw new Error('unauthorized');
+
+	if(findAuth.get().expirationDate < Date.now()){
+
+		findAuth.token = null;
+		findAuth.expirationDate = null;
+
+		await findAuth.save();
+
+		throw new Error('time expired');
+	}
+
+	const newPasswordHashed = await getBcryptHash(newPassword);
+
+	findAuth.token = null;
+	findAuth.expirationDate = null;
+	findAuth.password = newPasswordHashed;
+
+	// 2. Guardamos los cambios permanentemente
+	return await findAuth.save();
+}
+
+export { authRegister, authLogIn, generateToken, verifyToken, updatePassword, requestPasswordReset, resetPassword };
