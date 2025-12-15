@@ -35,7 +35,7 @@ class CreateReportPage extends HTMLElement {
 		// Buscamos el contenedor del mapa en nuestro Shadow DOM
 		const mapContainer = this.shadow.getElementById("map");
 
-		mapboxgl.accessToken = process.env.MAPBOX_TOKEN
+		mapboxgl.accessToken = "pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ"
 		// Inicializamos el mapa
 		const map = new mapboxgl.Map({
 			container: mapContainer as HTMLElement, // Referencia al div

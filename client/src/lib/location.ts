@@ -1,4 +1,4 @@
-const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_TOKEN;
+const MAPBOX_ACCESS_TOKEN = "pk.eyJ1Ijoic2FudGlhZ29ndXptYW44IiwiYSI6ImNtaHY0NnoxODA2czAybHB1dzl5dDN2aTEifQ.-kyc4EgAzGHoYDtRirsqdQ";
 
 async function getPositionFromDirection(city: string, address: string) {
 	const fullAddress = city + " " + address;
