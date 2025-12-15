@@ -53,7 +53,7 @@ export class NavBar extends HTMLElement {
         const header = document.createElement("header");
 
         header.innerHTML = `
-            <a href="/" class="logo">
+            <a href="/pets-around" class="logo">
                 <img src="https://res.cloudinary.com/drvtfag9j/image/upload/v1764215253/image_8_uv2crp.png">
             </a>
 

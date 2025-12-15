@@ -20,8 +20,7 @@ const app = express(); // Inicializamos express
 app.use(cors()); // Le decimos que la app usara el middleware de cors
 app.use(express.json({ limit: '30mb' })); // Y que usara el middleware de json de express para recibir peticiones
 
-// sequelize.sync({force: true}).then(e => e)
-// sequelize.sync({alter: true}).then(e => e)
+sequelize.sync({alter: true}).then(e => e);
 
 // Buscar un email
 // Utilizamos un endpoint para buscar dentro de users un email. Para evitar exponer la data del usuario, usamos POST en vez de GET
