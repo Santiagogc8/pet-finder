@@ -9,13 +9,20 @@ class HomePage extends HTMLElement{
 	}
 
 	connectedCallback() {
-        const currentState = state.getState()
-        if(currentState.coords){
-            history.pushState({}, '', '/pets-around');
+        const currentState = state.getState();
+
+        if(currentState.token){
+            if(currentState.coords){
+                history.pushState({}, '', '/pets-around');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+            } else {
+                this.render(); // Renderizamos el componente
+            }
+        } else{
+            history.pushState({}, '', '/');
             window.dispatchEvent(new PopStateEvent('popstate'));
-        } else {
-            this.render(); // Renderizamos el componente
         }
+        
 	}
 
 	render() {
