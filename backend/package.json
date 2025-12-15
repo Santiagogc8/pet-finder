@@ -7,7 +7,8 @@
     "dev": "nodemon --watch . --ext ts,json --exec tsx ./index.ts",
     "build": "tsc",
     "build:front": "cd ../client && pnpm install && pnpm build",
-    "start": "pnpm build:front && node dist/index.js"
+    "build:render": "pnpm i && pnpm build && pnpm build:front",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
