@@ -6,8 +6,8 @@ Una Single Page Application (SPA) diseñada para ayudar a reunir mascotas perdid
 
 ## 🔗 Enlaces Importantes
 
-- **📱 Aplicación Desplegada:** url
-- **📄 Documentación de la API:** url
+- **📱 Aplicación Desplegada:** [url](https://vanilla-pet-finder.onrender.com)
+- **📄 Documentación de la API:** [url](https://documenter.getpostman.com/view/48981749/2sB3dTtnrn)
 
 ---
 
