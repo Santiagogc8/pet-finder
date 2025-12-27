@@ -78,7 +78,7 @@ app.post("/auth/login", async (req, res) => {
 	} catch (error) {
 		// Si hay error
 		// Tiramos error con el mesaje del error
-		res.status(500).json({ error: `Error ocurred: ${error.message}` });
+		res.status(500).json({ error: `${error.message}` });
 	}
 });
 
