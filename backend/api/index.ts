@@ -76,9 +76,13 @@ app.post("/auth/login", async (req, res) => {
 		const token = await authLogIn(email, password);
 		res.json({ token }); // Retornamos el token creado
 	} catch (error) {
+		if(error.message.includes('incorrect') || error.message.includes('not found')){
+			return res.status(401).json({ error: `user not found or password incorrect` });
+		}
+
 		// Si hay error
 		// Tiramos error con el mesaje del error
-		res.status(500).json({ error: `${error.message}` });
+		return res.status(500).json({ error: `Internal Server Error` });
 	}
 });
 
