@@ -53,12 +53,17 @@ app.post("/auth/signup", async (req, res) => {
 		// Intentamos
 		// Pasarle a la funcion registerUser y esperar la respuesta
 		const registerRes = await registerUser(body);
-		res.json(registerRes); // Luego retornar la respuesta del registerUser
-	} catch (error) {
-		// Si hay error
-		// Tiramos error con el mesaje del error
-		res.status(500).json({ error: `Error ocurred: ${error.message}` });
-	}
+		res.status(200).json(registerRes); 
+    } catch (error: any) {
+        // Aquí capturamos lo que el controller lanzó
+        if (error.message === 'user already exists') {
+            // Error de cliente (lógica de negocio) -> 400
+            res.status(400).json({ error: error.message });
+        } else {
+            // Cualquier otro error inesperado -> 500
+            res.status(500).json({ error: `Error ocurred: ${error.message}` });
+        }
+    }
 });
 
 // Login
