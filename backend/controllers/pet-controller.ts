@@ -146,20 +146,33 @@ async function updatePet(petId: number, userId: number, newData: any) {
             throw new Error("pet not found or you are not the owner");
         }
 
-		let algoliaUpdateData = { ...updateData }; // Copia inicial
+		let algoliaUpdateData = { ...updateData };
 
-        // Si hay coordenadas, transformamos la estructura
-        if (updateData.lat && updateData.lng) {
-            const { lat, lng, ...rest } = updateData;
-            algoliaUpdateData = rest; // El objeto sin lat/lng sueltos
-            algoliaUpdateData._geoloc = { lat, lng }; // Agregamos la estructura correcta
-        }
-
-		const {taskID} = await client.partialUpdateObject({
-			indexName,
-			objectID: petId.toString(),
-			attributesToUpdate: algoliaUpdateData
-		})
+		// Manejo de la IMAGEN (Renombrar imageUrl -> imgUrl)
+		if (algoliaUpdateData.imageUrl) {
+		    algoliaUpdateData.imgUrl = algoliaUpdateData.imageUrl;
+		    delete algoliaUpdateData.imageUrl; // Borramos la propiedad vieja
+		}
+		
+		// Manejo de GEOLOCALIZACIÓN (Estructurar _geoloc)
+		if (algoliaUpdateData.lat && algoliaUpdateData.lng) {
+		    // Creamos la propiedad especial de Algolia
+		    algoliaUpdateData._geoloc = {
+		        lat: algoliaUpdateData.lat,
+		        lng: algoliaUpdateData.lng
+		    };
+		
+		    // Borramos las coordenadas sueltas que ya no necesitamos en el root
+		    delete algoliaUpdateData.lat;
+		    delete algoliaUpdateData.lng;
+		}
+		
+		// 4. Enviamos a Algolia...
+		const { taskID } = await client.partialUpdateObject({
+		    indexName,
+		    objectID: petId.toString(),
+		    attributesToUpdate: algoliaUpdateData
+		});
 
 		return { message: "pet updated successfully", taskID };
 	} catch(error){
