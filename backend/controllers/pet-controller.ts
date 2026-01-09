@@ -123,7 +123,7 @@ async function updatePet(petId: number, userId: number, newData: any) {
 
 		if (cloudinaryImgSecureUrl.error) throw new Error(cloudinaryImgSecureUrl.error);
 
-		updateData.imgUrl = cloudinaryImgSecureUrl;
+		updateData.imageUrl = cloudinaryImgSecureUrl;
 	}
 
     // Recorremos la lista blanca (allowedFields)
