@@ -2,7 +2,7 @@ import { Auth } from "../db/models";
 // import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { Transaction } from "sequelize";
 import { resend } from "../lib/resend";
 
@@ -49,25 +49,24 @@ async function authRegister(
 
 // Creamos la funcion para autorizar un login (recibimos email y password)
 async function authLogIn(email: string, password: string) {
-	try {
-		// Hacemos un findOne donde buscamos el email recibido y el password en sha256 en la tabla Auth
-		const findAuth = await Auth.findOne({ where: { email } });
+	// Hacemos un findOne donde buscamos el email recibido y el password en sha256 en la tabla Auth
+	const findAuth = await Auth.findOne({ where: { email } });
 
-		// Obtenemos el password del findAuth
-		const findAuthPassword = (await findAuth.get("password")) as string;
+	if(!findAuth){
+		throw new Error("user not found")
+	}
 
-		// Verificamos si la comparacion del password recibido y el password guardado en la db son iguales
-		if (await bcrypt.compare(password, findAuthPassword)) {
-			// Creamos un token con jwt guardando el id
-			const token = generateToken(findAuth.get("userId") as number);
-			return token; // Y retornamos el token
-		} else {
-			// Si no encontro el user
-			throw new Error("email or password incorrect"); // Tiramos error
-		}
-	} catch (error) {
-		// Si hay un error
-		return { error: `an error has ocurred: ${error.message}` }; // Lo retornamos
+	// Obtenemos el password del findAuth
+	const findAuthPassword = (await findAuth.get("password")) as string;
+
+	// Verificamos si la comparacion del password recibido y el password guardado en la db son iguales
+	if (await bcrypt.compare(password, findAuthPassword)) {
+		// Creamos un token con jwt guardando el id
+		const token = generateToken(findAuth.get("userId") as number);
+		return token; // Y retornamos el token
+	} else {
+		// Si no encontro el user
+		throw new Error("email or password incorrect"); // Tiramos error
 	}
 }
 
@@ -85,39 +84,42 @@ function verifyToken(token: string) {
 }
 
 async function updatePassword(userId: number, newPassword: string) {
-    const newPasswordHashed = await getBcryptHash(newPassword)
+	const newPasswordHashed = await getBcryptHash(newPassword);
 
-	const [ count ] = await Auth.update(
+	const [count] = await Auth.update(
 		{ password: newPasswordHashed },
 		{ where: { userId } }
 	);
 
-    return count;
+	return count;
 }
 
 async function requestPasswordReset(email: string) {
 	const findAuth = await Auth.findOne({
-		where: { email }
+		where: { email },
 	});
 
-	if(!findAuth) throw new Error('user not found');
+	if (!findAuth) throw new Error("user not found");
 
 	const token = uuidv4();
 	const expirationDate = new Date(Date.now() + 30 * 60 * 1000);
 
-	const [count] = await Auth.update({
-		token,
-		expirationDate
-	}, {where: {email}});
+	const [count] = await Auth.update(
+		{
+			token,
+			expirationDate,
+		},
+		{ where: { email } }
+	);
 
 	resend.emails.send({
-		from: 'PetFinder App <onboarding@resend.dev>',
+		from: "PetFinder App <onboarding@resend.dev>",
 		to: email,
 		subject: "Tu enlace para recuperar la contraseña de Pet Finder App",
 		html: `
 			<p>Este es tu enlace de recuperacion de contraseña</p>
 			<a href="${FRONTURL}/reset-password?id=${token}">Recupera tu contraseña</a>
-		`
+		`,
 	});
 
 	return count;
@@ -125,19 +127,18 @@ async function requestPasswordReset(email: string) {
 
 async function resetPassword(token: string, newPassword: string) {
 	const findAuth = await Auth.findOne({
-		where: { token }
+		where: { token },
 	});
 
-	if(!findAuth) throw new Error('unauthorized');
+	if (!findAuth) throw new Error("unauthorized");
 
-	if(findAuth.get().expirationDate < Date.now()){
-
+	if (findAuth.get().expirationDate < Date.now()) {
 		findAuth.token = null;
 		findAuth.expirationDate = null;
 
 		await findAuth.save();
 
-		throw new Error('time expired');
+		throw new Error("time expired");
 	}
 
 	const newPasswordHashed = await getBcryptHash(newPassword);
@@ -150,4 +151,12 @@ async function resetPassword(token: string, newPassword: string) {
 	return await findAuth.save();
 }
 
-export { authRegister, authLogIn, generateToken, verifyToken, updatePassword, requestPasswordReset, resetPassword };
+export {
+	authRegister,
+	authLogIn,
+	generateToken,
+	verifyToken,
+	updatePassword,
+	requestPasswordReset,
+	resetPassword,
+};

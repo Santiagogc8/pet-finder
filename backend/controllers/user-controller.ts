@@ -32,6 +32,10 @@ async function registerUser(data: userData) {
 			transaction: t, // Le definimos la propiedad transaction con la transaccion que guardamos en t
 		});
 
+		if(!userCreated){
+			throw new Error('user already exists')
+		}
+
 		const newUserId = user.get("id") as number; // Extrae el id del user creado o encontrado
 
 		// Y lo pasa por la funcion authRegister (junto con la transaccion)
@@ -48,8 +52,8 @@ async function registerUser(data: userData) {
 			return registerStatus; // Retornamos el estado
 		}
 	} catch (error) {
-		// Si hay un error
-		return { error: `an error has ocurred: ${error.message}` }; // Lo retornamos
+		await t.rollback(); // Deshace todo lo de la transaccion
+		throw error; // Lanzamos el error para que alguien mas lo atrape
 	}
 }
 
