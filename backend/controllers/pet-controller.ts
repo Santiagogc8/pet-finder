@@ -115,8 +115,16 @@ async function getUserPets(userId: number) {
 }
 
 async function updatePet(petId: number, userId: number, newData: any) {
-	const allowedFields = ['name', 'lat', 'lng', 'imgUrl', 'lost']; // Qué permitimos
+	const allowedFields = ['name', 'lat', 'lng', 'lost']; // Qué permitimos
     const updateData: any = {}; // Donde guardaremos los datos que si enviaremos
+
+	if(newData.imgUrl && newData.imgUrl.includes('data:image')){
+		const cloudinaryImgSecureUrl = (await uploadImage(newData.imgUrl)) as any;
+
+		if (cloudinaryImgSecureUrl.error) throw new Error(cloudinaryImgSecureUrl.error);
+
+		updateData.imgUrl = cloudinaryImgSecureUrl;
+	}
 
     // Recorremos la lista blanca (allowedFields)
     allowedFields.forEach(field => {
